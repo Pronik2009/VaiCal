@@ -26,62 +26,62 @@ class Year
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $jan = [];
+    private ?array $jan = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $feb = [];
+    private ?array $feb = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $mar = [];
+    private ?array $mar = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $apr = [];
+    private ?array $apr = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $may = [];
+    private ?array $may = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $jun = [];
+    private ?array $jun = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $jul = [];
+    private ?array $jul = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $aug = [];
+    private ?array $aug = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $sem = [];
+    private ?array $sem = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $oct = [];
+    private ?array $oct = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $nov = [];
+    private ?array $nov = [];
 
     /**
      * @ORM\Column(type="array", nullable=true)
      */
-    private array $dem = [];
+    private ?array $dem = [];
 
     /**
      * @ORM\ManyToOne(targetEntity=City::class, inversedBy="years")
