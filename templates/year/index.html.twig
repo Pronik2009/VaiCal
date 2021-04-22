@@ -1,0 +1,25 @@
+{% extends '@!EasyAdmin/page/content.html.twig' %}
+
+{% block page_title 'Upload city file' %}
+
+
+{% block page_content %}
+    <div class="action_button action_add template_add">
+        <form action="{{ path('year_upload') }}" method="post" enctype="multipart/form-data">
+            <label for="fileButton">Select prepared file with dates, like "Запорожье_dates.txt"</label>
+            <br>
+            <input id="fileButton" name="upload" type="file" required="required">
+            <br><br>
+            <label for="cityName">Select exist or enter new city name:</label>
+            <br>
+            <input id="cityName" name="city" type="search" list="cityList" required="required">
+            <br><br>
+            <button type="submit" id="submitButton">submit</button>
+        </form>
+    </div>
+<datalist id="cityList">
+    {% for city in cities %}
+    <option value="{{ city['name'] }}">
+    {% endfor %}
+</datalist>
+{% endblock %}
