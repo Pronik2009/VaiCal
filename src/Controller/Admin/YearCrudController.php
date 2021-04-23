@@ -59,7 +59,7 @@ class YearCrudController extends AbstractCrudController
     {
         $filters
             ->add(EntityFilter::new('city'))
-            ->add(NumericFilter::new('value'))
+            ->add(NumericFilter::new('value', 'Year'))
         ;
 
         return parent::configureFilters($filters);
