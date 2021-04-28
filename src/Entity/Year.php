@@ -2,11 +2,22 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\YearRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ORM\Entity(repositoryClass=YearRepository::class)
+ *
+ * @ApiResource(
+ *     collectionOperations={"get"={}},
+ *     itemOperations={"get"={}},
+ *     paginationEnabled=false
+ * )
+ *
+ * @ApiFilter(SearchFilter::class, properties={"city": "exact", "value": "exact"})
  */
 class Year
 {
@@ -19,7 +30,6 @@ class Year
 
     /**
      * @ORM\Column(type="integer")
-     * @
      */
     private int $value;
 
