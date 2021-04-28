@@ -20,7 +20,7 @@ final class Version20210421214645 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         $sql = <<<SQL
-INSERT INTO vaical.user (id, email, roles, password) VALUES (1,'test@test.com','{"role": "ROLE_ADMIN"}','\$argon2id\$v=19\$m=65536,t=4,p=1\$OHN0NUJVanFBOGdNMXJnSg\$RmTaU+0Yd5WRpnwjHK2090aXwWe1dFRM8VfBmX9g4fk')
+INSERT INTO user (id, email, roles, password) VALUES (1,'test@test.com','{"role": "ROLE_ADMIN"}','\$argon2id\$v=19\$m=65536,t=4,p=1\$OHN0NUJVanFBOGdNMXJnSg\$RmTaU+0Yd5WRpnwjHK2090aXwWe1dFRM8VfBmX9g4fk')
 SQL;
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql($sql);
