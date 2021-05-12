@@ -19,6 +19,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * @ApiResource(
  *     collectionOperations={"get"},
  *     itemOperations={"get"},
+ *     order={"slug"="ASC"},
  *     normalizationContext={"groups"={"read"}},
  *     paginationEnabled=false
  * )
