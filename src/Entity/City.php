@@ -17,9 +17,26 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * @ORM\Entity(repositoryClass=CityRepository::class)
  *
  * @ApiResource(
- *     collectionOperations={"get"},
+ *     collectionOperations={"get","post"={
+ *          "method"="POST",
+ *          "path"="/cities/new",
+ *          "controller"="NewCityController::class",
+ *          "openapi_context"={
+ *              "summary"="Propose new city to database",
+ *              "description"="# Anonymous queries will be rejected.
+ *      Accept queries only from front APP.
+ *      Require two parameters in JSON, as city slug and security token
+ *      On success return {id} of new city request, can be used while connect to employers",
+ *              "requestBody"={"content"={"application/json"={"schema"={},"example"={
+ *                  "name"="Perímetro Urbano Santiago de Cali",
+ *                  "lat"="48.46012365355584",
+ *                  "lon"="-35.04221496410461",
+ *                  "token"="someHashHereABCDEFG1234567890blablabla",
+ *              }}}}
+ *          }
+ *     }},
  *     itemOperations={"get"},
- *     order={"slug"="ASC"},
+ *     order={"name"="ASC"},
  *     normalizationContext={"groups"={"read"}},
  *     paginationEnabled=false
  * )
