@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use ErrorException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -48,15 +49,19 @@ class YearController extends AbstractController
     }
 
     /**
-     * @Route("/year/upload", name="year_upload")
+     * @Route("/year/upload/{format}", defaults={"format"=null}, name="year_upload")
      *
      * @param Request $request
+     * @ParamConverter("format")
+     * @param string|null $format
      * @param ImportService $importService
      * @param AdminUrlGenerator $adminUrlGenerator
      *
      * @return RedirectResponse
-     */
-    public function import(Request $request, ImportService $importService, AdminUrlGenerator $adminUrlGenerator): RedirectResponse
+     *
+     * @IsGranted("ROLE_ADMIN")
+    **/
+    public function import(Request $request, ImportService $importService, AdminUrlGenerator $adminUrlGenerator, string $format = null): RedirectResponse
     {
         $directory = $this->projectDir;
         /** @var File\UploadedFile $uploadedFile */
@@ -69,14 +74,14 @@ class YearController extends AbstractController
             $file = file($tmpFilePath, FILE_IGNORE_NEW_LINES);
             $this->removeTmp($tmpFilePath);
             if ($file) {
-                $importService->parseAndSave($file, $request->get('city'));
+                $importService->parseAndSave($file, $request->get('city'), $format);
                 $this->addFlash('success', $message . 'was uploaded!');
             } else {
                 $this->addFlash('warning', $message . 'wrong format!');
             }
         } catch (ErrorException $e) {
             $this->removeTmp($tmpFilePath);
-            $this->addFlash('warning', $message . 'was not uploaded!');
+            $this->addFlash('warning', $message . 'was not uploaded!<br>' . $e->getMessage());
         }
 
         $url = $adminUrlGenerator

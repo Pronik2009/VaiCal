@@ -260,12 +260,12 @@ class Year
         return $this;
     }
 
-    public function getCity(): ?City
+    public function getCity(): City
     {
         return $this->city;
     }
 
-    public function setCity(?City $city): self
+    public function setCity(City $city): self
     {
         $this->city = $city;
 
