@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class ImportService
 {
     private const HOLIDAYS = [
+        // Mandatory leave 0 and 1 rows untouched - this is Ekadasi ankors. All another can be in any order
         '(suitable for fasting)',
         '   Break fast',
         'Appearance of Sri Nityananda Prabhu',
@@ -22,7 +23,7 @@ class ImportService
         'Appearance of Srimati Radharani',
         'Govardhana Puja',
         '  Ratha Yatra',
-        'Srila Prabhupada -- Disappearance',
+//        'Srila Prabhupada -- Disappearance',
     ];
     private EntityManagerInterface $em;
 
