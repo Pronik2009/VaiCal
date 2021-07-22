@@ -26,18 +26,18 @@ class YearCrudController extends AbstractCrudController
         $id = IdField::new('id');
         $city = AssociationField::new('city');
         $year = IntegerField::new('value');
-        $jan = ArrayField::new('janstr');
-        $feb = ArrayField::new('febstr');
-        $mar = ArrayField::new('marstr');
-        $apr = ArrayField::new('aprstr');
-        $may = ArrayField::new('maystr');
-        $jun = ArrayField::new('junstr');
-        $jul = ArrayField::new('julstr');
-        $aug = ArrayField::new('augstr');
-        $sem = ArrayField::new('semstr');
-        $oct = ArrayField::new('octstr');
-        $nov = ArrayField::new('novstr');
-        $dem = ArrayField::new('demstr');
+        $jan = ArrayField::new('janstr', 'January');
+        $feb = ArrayField::new('febstr', 'February');
+        $mar = ArrayField::new('marstr', 'March');
+        $apr = ArrayField::new('aprstr', 'April');
+        $may = ArrayField::new('maystr', 'May');
+        $jun = ArrayField::new('junstr', 'June');
+        $jul = ArrayField::new('julstr', 'July');
+        $aug = ArrayField::new('augstr', 'August');
+        $sem = ArrayField::new('semstr', 'September');
+        $oct = ArrayField::new('octstr', 'October');
+        $nov = ArrayField::new('novstr', 'November');
+        $dem = ArrayField::new('demstr', 'December');
 
         return [
             $id, $city, $year,

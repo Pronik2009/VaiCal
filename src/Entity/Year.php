@@ -337,7 +337,7 @@ class Year
         $result = [];
         foreach ($array as $item) {
             if (is_array($item)) {
-                $result[] = implode('/', $item);
+                $result[] = implode('-', $item);
             } else {
                 $result[] = $item;
             }
