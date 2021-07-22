@@ -100,6 +100,7 @@ class NewCityController extends AbstractController
 
         return $this->json([
             'id' => $newCity->getId(),
+            'name' => $newCity->getName(),
             'message' => 'accepted',
         ],
             Response::HTTP_ACCEPTED

@@ -26,18 +26,18 @@ class YearCrudController extends AbstractCrudController
         $id = IdField::new('id');
         $city = AssociationField::new('city');
         $year = IntegerField::new('value');
-        $jan = ArrayField::new('jan');
-        $feb = ArrayField::new('feb');
-        $mar = ArrayField::new('mar');
-        $apr = ArrayField::new('apr');
-        $may = ArrayField::new('may');
-        $jun = ArrayField::new('jun');
-        $jul = ArrayField::new('jul');
-        $aug = ArrayField::new('aug');
-        $sem = ArrayField::new('sem');
-        $oct = ArrayField::new('oct');
-        $nov = ArrayField::new('nov');
-        $dem = ArrayField::new('dem');
+        $jan = ArrayField::new('janstr');
+        $feb = ArrayField::new('febstr');
+        $mar = ArrayField::new('marstr');
+        $apr = ArrayField::new('aprstr');
+        $may = ArrayField::new('maystr');
+        $jun = ArrayField::new('junstr');
+        $jul = ArrayField::new('julstr');
+        $aug = ArrayField::new('augstr');
+        $sem = ArrayField::new('semstr');
+        $oct = ArrayField::new('octstr');
+        $nov = ArrayField::new('novstr');
+        $dem = ArrayField::new('demstr');
 
         return [
             $id, $city, $year,

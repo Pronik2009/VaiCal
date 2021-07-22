@@ -10,9 +10,10 @@ use Doctrine\ORM\EntityManagerInterface;
 class ImportService
 {
     private const HOLIDAYS = [
-        // Mandatory leave 0 and 1 rows untouched - this is Ekadasi ankors. All another can be in any order
+        // Mandatory leave 0, 1 and 2 rows untouched - this is Ekadasi ankors. All another can be in any order
         '(suitable for fasting)',
         '   Break fast',
+        '  Fasting for ',
         'Appearance of Sri Nityananda Prabhu',
         'Appearance of Sri Caitanya Mahaprabhu',
         'Appearance of Lord Sri Ramacandra',
@@ -41,7 +42,6 @@ class ImportService
     {
         if ($format === 'gcal') {
             $fileClear = $this->clearUnusedRows($file);
-//        dd($fileClear);
             $years = $this->parseFileClearToYear($fileClear);
         } else {
             $years = $this->parseFileToYear($file);
@@ -165,10 +165,14 @@ class ImportService
         $i = 0;
         $count = count($file);
         while ($i < $count) {
-            //найден Экадаши - оставляем только дату, забираем к ней выход из поста из позаследующей сстроки
+            // найден Экадаши - оставляем только дату,
+            // забираем к ней имя Экадаши из следующей строки,
+            // и выход из поста из позаследующей сстроки
             if (is_numeric($file[$i][1]) && strpos($file[$i], $this::HOLIDAYS[0])) {
-                $result[] = substr($file[$i], 0, 11) . ' ' . substr($file[$i+2], 17);
-                $i++;
+                $result[] = substr($file[$i], 0, 11) . ' '
+                    . substr($file[$i+1], 17) . ' '
+                    . substr($file[$i+3], 17);
+                $i+=2;
                 continue;
             }
             //найден один из праздников - оставляем только текст, забираем дату из предыдущей строки (exclude "break fast" because Nityananda issue)
@@ -234,35 +238,45 @@ class ImportService
     /**
      * @param string $row
      *
-     * @return string
+     * @return array|string
      */
-    private function holidayCodeFromString(string $row): string
+    private function holidayCodeFromString(string $row)
     {
         $row = substr($row, 12);
         switch ($this->inHolidays($row, true)) {
             case 1:
-                return '0 ' . substr($row, 11);
-            case 2:
-                return '1';
+                $ekadasiPosition = strpos($row, ' Ekadasi');
+                $ekadasiName = substr($row, 12, $ekadasiPosition - strlen($row));
+                $lightTime = str_contains($row, '(DST)') ? 'DST' : 'LT';
+                $exitTime = substr(substr($row, $ekadasiPosition + 20), 0, $lightTime === 'DST' ? -6 : -5);
+
+                return [
+                    'holiday' => '0',
+                    'ekadasi_name' => $ekadasiName,
+                    'exit_time' => $exitTime,
+                    'light_time' => $lightTime,
+                ];
             case 3:
-                return '2';
+                return '1';
             case 4:
-                return '3';
+                return '2';
             case 5:
-                return '4';
+                return '3';
             case 6:
-                return '6';
+                return '4';
             case 7:
-                return '7';
+                return '6';
             case 8:
-                return '8';
+                return '7';
             case 9:
-                return '9';
+                return '8';
             case 10:
-                return 'A';
+                return '9';
             case 11:
-                return 'B';
+                return 'A';
             case 12:
+                return 'B';
+            case 13:
                 return 'C';
             default:
                 return 'ERROR!';
