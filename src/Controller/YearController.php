@@ -3,10 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\City;
+use App\Repository\CityRepository;
 use App\Service\ImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
-use ErrorException;
+use Exception;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\File;
 class YearController extends AbstractController
 {
     public const TempFileName = 'uploaded_city.txt';
-    public $projectDir;
+    public string $projectDir;
 
     public function __construct(KernelInterface $kernel)
     {
@@ -40,7 +41,9 @@ class YearController extends AbstractController
      */
     public function index(EntityManagerInterface $em): Response
     {
-        $cities = $em->getRepository(City::class)->getAllNames();
+        /** @var CityRepository $cityRepo */
+        $cityRepo = $em->getRepository(City::class);
+        $cities = $cityRepo->getAllNames();
 
         return $this->render('year/index.html.twig', [
             'controller_name' => 'YearController',
@@ -79,7 +82,7 @@ class YearController extends AbstractController
             } else {
                 $this->addFlash('warning', $message . 'wrong format!');
             }
-        } catch (ErrorException $e) {
+        } catch (Exception $e) {
             $this->removeTmp($tmpFilePath);
             $this->addFlash('warning', $message . 'was not uploaded!<br>' . $e->getMessage());
         }

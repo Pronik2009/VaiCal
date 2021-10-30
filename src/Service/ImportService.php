@@ -133,7 +133,7 @@ class ImportService
     /**
      * @param array $file
      *
-     * @return array|string
+     * @return array
      */
     private function clearUnusedRows(array $file): array
     {
