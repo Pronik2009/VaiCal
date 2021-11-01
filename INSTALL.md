@@ -1,4 +1,4 @@
-#Installation guide
+# Installation guide
 
 1. **clone** this repo to target directory
 2. **run** `composer install`
