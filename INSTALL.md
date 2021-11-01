@@ -2,7 +2,7 @@
 
 1. **clone** this repo to target directory
 2. **run** `composer install`
-3. edit .env and **set database** driver (any suitable for Doctrine ORM, e.g. MySQL etc)
+3. edit **.env** and **set database** driver (any suitable for Doctrine ORM, e.g. MySQL etc)
 4. **run** `php bin/console database:create somedbname` to create databaase, if need
 5. **run** `php bin/console do:mi:mi` to create DB structure and default user account
 6. make sure **web-server** will execute /public/index.php
