@@ -14,6 +14,7 @@ REST based on [API platform](https://api-platform.com/). Have next abilities:
 2. List of saved years
 3. **Parser** for old VaiCal text files and for GCal 11 output. After successful validation, parsed data will be save to DB
 4. List of new city request
+
 _User management_ was not realized as usually, common test admin with wake password create for developing purposes.
 **Don't forget create secure accounts on production!**
 
