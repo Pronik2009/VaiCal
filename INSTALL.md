@@ -1,3 +1,5 @@
+#Installation guide
+
 1. **clone** this repo to target directory
 2. **run** `composer install`
 3. edit .env and **set database** driver (any suitable for Doctrine ORM, e.g. MySQL etc)
