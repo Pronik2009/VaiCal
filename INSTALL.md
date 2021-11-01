@@ -1,4 +1,4 @@
-1. **Clone** this repo to target directory
+1. **clone** this repo to target directory
 2. **run** `composer install`
 3. edit .env and **set database** driver (any suitable for Doctrine ORM, e.g. MySQL etc)
 4. make sure **web-server** will execute /public/index.php
