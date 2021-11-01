@@ -4,8 +4,10 @@ namespace App\Service;
 
 use App\Entity\City;
 use App\Entity\Year;
+use App\Repository\YearRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
 class ImportService
 {
@@ -37,18 +39,31 @@ class ImportService
      * @param array $file
      * @param string $cityName
      * @param string|null $format
+     *
+     * @return array
+     *
+     * @throws Exception
      */
-    public function parseAndSave(array $file, string $cityName, string $format = null): void
+    public function parseAndSave(array $file, string $cityName, string $format = null): array
     {
         if ($format === 'gcal') {
+            $this->validateGcalFormat($file);
             $fileClear = $this->clearUnusedRows($file);
             $years = $this->parseFileClearToYear($fileClear);
         } else {
             $years = $this->parseFileToYear($file);
         }
         $city = $this->getCityByName($cityName);
-
+        /** @var YearRepository $yearRepo */
+        $yearRepo = $this->em->getRepository(Year::class);
+        $cityYears = $yearRepo->getCityYears($city);
+        $recorded = 0;
+        $skipped = 0;
         foreach ($years as $key => $value) {
+            if (in_array($key, $cityYears, true)) {
+                $skipped++;
+                continue;
+            }
             $year = new Year();
             $year->setCity($city);
             $year->setValue($key);
@@ -65,9 +80,15 @@ class ImportService
             $year->setNov($value[11] ?? null);
             $year->setDem($value[12] ?? null);
 
+            $recorded++;
             $this->em->persist($year);
         }
         $this->em->flush();
+
+        return [
+            'recorded' => $recorded,
+            'skipped' => $skipped,
+        ];
     }
 
     /**
@@ -143,7 +164,7 @@ class ImportService
         $i = 0;
         $count = count($file);
         while ($i < $count) {
-            if (empty($file[$i])){
+            if (empty($file[$i])) {
                 unset($file[$i]);
             }
             $i++;
@@ -154,7 +175,7 @@ class ImportService
         $i = 0;
         $count = count($file);
         while ($i < $count) {
-            if (!is_numeric($file[$i][1]) && !$this->inHolidays($file[$i])){
+            if (!is_numeric($file[$i][1]) && !$this->inHolidays($file[$i])) {
                 unset($file[$i]);
             }
             $i++;
@@ -170,15 +191,15 @@ class ImportService
             // и выход из поста из позаследующей сстроки
             if (is_numeric($file[$i][1]) && strpos($file[$i], $this::HOLIDAYS[0])) {
                 $result[] = substr($file[$i], 0, 11) . ' '
-                    . substr($file[$i+1], 17) . ' '
-                    . substr($file[$i+3], 17);
-                $i+=2;
+                    . substr($file[$i + 1], 17) . ' '
+                    . substr($file[$i + 3], 17);
+                $i += 2;
                 continue;
             }
             //найден один из праздников - оставляем только текст, забираем дату из предыдущей строки (exclude "break fast" because Nityananda issue)
             if (!is_numeric($file[$i][1]) && $this->inHolidays($file[$i]) && !strpos($file[$i], $this::HOLIDAYS[1])) {
                 //check if previous row have date, if not - take previous from previous (Nityananda issue)
-                $dateSubStr = is_numeric($file[$i-1][1]) ? substr($file[$i-1], 0, 11) : substr($file[$i-2], 0, 11);
+                $dateSubStr = is_numeric($file[$i - 1][1]) ? substr($file[$i - 1], 0, 11) : substr($file[$i - 2], 0, 11);
                 $result[] = $dateSubStr . ' ' . substr($file[$i], 17);
             }
             //ничего интересного не найдено
@@ -197,8 +218,8 @@ class ImportService
      */
     private function inHolidays(string $string, bool $responseFormat = false)
     {
-        foreach ($this::HOLIDAYS as $key=>$HOLIDAY) {
-            if (strpos($string, $responseFormat ? trim($HOLIDAY) : $HOLIDAY)!==false) {
+        foreach ($this::HOLIDAYS as $key => $HOLIDAY) {
+            if (strpos($string, $responseFormat ? trim($HOLIDAY) : $HOLIDAY) !== false) {
                 return $responseFormat ? $key : true;
             }
         }
@@ -223,10 +244,10 @@ class ImportService
             $month = $date->format('n');
             $day = $date->format('j');
 
-            if (!array_key_exists($year, $years)){
+            if (!array_key_exists($year, $years)) {
                 $years[$year] = [];
             }
-            if (!array_key_exists($month, $years[$year])){
+            if (!array_key_exists($month, $years[$year])) {
                 $years[$year][$month] = [];
             }
             $years[$year][$month][$day] = $this->holidayCodeFromString($row);
@@ -280,6 +301,28 @@ class ImportService
                 return 'C';
             default:
                 return 'ERROR!';
+        }
+    }
+
+    /**
+     * @param array $file
+     *
+     * @throws Exception
+     */
+    private function validateGcalFormat(array $file): void
+    {
+        $requiredStrings = [
+            'Narayana Masa, Gaurabda 493',
+            'GCal 11',
+            'DATE',
+            'TITHI',
+            'FAST',
+        ];
+        $text = implode(PHP_EOL, $file);
+        foreach ($requiredStrings as $string) {
+            if (!str_contains($text, $string)) {
+                throw new Exception('Required key "' . $string . '" not found!');
+            }
         }
     }
 }

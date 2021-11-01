@@ -77,10 +77,15 @@ class YearController extends AbstractController
             $file = file($tmpFilePath, FILE_IGNORE_NEW_LINES);
             $this->removeTmp($tmpFilePath);
             if ($file) {
-                $importService->parseAndSave($file, $request->get('city'), $format);
-                $this->addFlash('success', $message . 'was uploaded!');
+                $stat = $importService->parseAndSave($file, $request->get('city'), $format);
+                $saved = $stat['recorded'] !== 0 ? 'Saved: ' . $stat['recorded'] . ' years' : '';
+                $skipped = $stat['skipped'] !== 0 ? 'Already exist: ' . $stat['skipped'] . ' years' : '';
+                $this->addFlash($stat['recorded'] !== 0 ? 'success' : 'warning',
+                    $message . 'was uploaded!' . '<br>'
+                    . $saved . '<br>' . $skipped
+                );
             } else {
-                $this->addFlash('warning', $message . 'wrong format!');
+                $this->addFlash('warning', $message . 'is empty!');
             }
         } catch (Exception $e) {
             $this->removeTmp($tmpFilePath);

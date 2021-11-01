@@ -6,10 +6,12 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\YearRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\UniqueConstraint;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ORM\Entity(repositoryClass=YearRepository::class)
+ * @ORM\Table(uniqueConstraints={@UniqueConstraint(name="unique_year_in_city_idx", columns={"city_id", "value"})})
  *
  * @ApiResource(
  *     collectionOperations={"get"={}},
