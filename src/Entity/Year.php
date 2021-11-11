@@ -8,12 +8,14 @@ use App\Repository\YearRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=YearRepository::class)
  * @ORM\Table(uniqueConstraints={@UniqueConstraint(name="unique_year_in_city_idx", columns={"city_id", "value"})})
  *
  * @ApiResource(
+ *     normalizationContext={"groups"={"year"}},
  *     collectionOperations={"get"={}},
  *     itemOperations={"get"={}},
  *     paginationEnabled=false
@@ -24,78 +26,93 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 class Year
 {
     /**
+     * @Groups({"year"})
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private int $id;
+    private ?int $id = null;
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="integer")
      */
     private int $value;
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $jan = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $feb = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $mar = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $apr = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $may = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $jun = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $jul = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $aug = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $sem = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $oct = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $nov = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\Column(type="array", nullable=true)
      */
     private ?array $dem = [];
 
     /**
+     * @Groups({"year"})
      * @ORM\ManyToOne(targetEntity=City::class, inversedBy="years")
      * @ORM\JoinColumn(nullable=false)
      */
@@ -346,5 +363,14 @@ class Year
         }
 
         return $result;
+    }
+
+    /**
+     * @Groups({"year"})
+     * @return int|null
+     */
+    public function getZone(): ?int
+    {
+        return $this->city->getZone();
     }
 }

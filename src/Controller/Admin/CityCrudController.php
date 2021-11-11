@@ -7,6 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
@@ -25,15 +26,16 @@ class CityCrudController extends AbstractCrudController
             ->setTargetFieldName('name')
         ;
         $years = AssociationField::new('years');
+        $zone = IntegerField::new('zone');
 
         if ($pageName === Crud::PAGE_EDIT || $pageName === Crud::PAGE_NEW) {
             return [
-                $name, $slug,
+                $name, $slug, $zone,
             ];
         }
 
         return [
-            $id, $name, $slug, $years,
+            $id, $name, $slug, $years, $zone,
         ];
     }
 }

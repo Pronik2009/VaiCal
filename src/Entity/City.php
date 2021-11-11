@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
@@ -51,24 +52,32 @@ class City
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @Groups({"read"})
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private string $name;
 
     /**
      * @Groups({"read"})
      * @ORM\Column(type="string", length=255)
      */
-    private $slug;
+    private string $slug;
 
     /**
      * @ORM\OneToMany(targetEntity=Year::class, mappedBy="city", orphanRemoval=true)
      */
     private $years;
+
+    /**
+     * @Groups({"read"})
+     * @ORM\Column(type="smallint", nullable=true)
+     * @Assert\GreaterThanOrEqual(-12)
+     * @Assert\LessThanOrEqual(12)
+     */
+    private ?int $zone;
 
     public function __construct()
     {
@@ -137,6 +146,18 @@ class City
                 $year->setCity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getZone(): ?int
+    {
+        return $this->zone;
+    }
+
+    public function setZone(?int $zone): self
+    {
+        $this->zone = $zone;
 
         return $this;
     }

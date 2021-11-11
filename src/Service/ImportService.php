@@ -48,12 +48,13 @@ class ImportService
     {
         if ($format === 'gcal') {
             $this->validateGcalFormat($file);
+            $cityZone = $this->getTimeZoneFromFile($file);
             $fileClear = $this->clearUnusedRows($file);
             $years = $this->parseFileClearToYear($fileClear);
         } else {
             $years = $this->parseFileToYear($file);
         }
-        $city = $this->getCityByName($cityName);
+        $city = $this->getCityByName($cityName, $cityZone ?? null);
         /** @var YearRepository $yearRepo */
         $yearRepo = $this->em->getRepository(Year::class);
         $cityYears = $yearRepo->getCityYears($city);
@@ -134,16 +135,18 @@ class ImportService
 
     /**
      * @param string $cityName
+     * @param int|null $zone
      *
      * @return City
      */
-    private function getCityByName(string $cityName): City
+    private function getCityByName(string $cityName, ?int $zone = null): City
     {
         $city = $this->em->getRepository(City::class)->findOneBy(["name" => $cityName]);
 
         if (!$city) {
             $city = new City();
             $city->setName($cityName);
+            $city->setZone($zone);
             $this->em->persist($city);
             $this->em->flush();
         }
@@ -324,5 +327,30 @@ class ImportService
                 throw new Exception('Required key "' . $string . '" not found!');
             }
         }
+    }
+
+    private function getTimeZoneFromFile(array $file): ?int
+    {
+        $result = null;
+        foreach ($file as $string) {
+            if (str_contains($string, '] (')) {
+                $positive = strpos($string, ', +');
+                $negative = strpos($string, ', -');
+                if ($positive) {
+                    $signPosition = $positive + 2;
+                }
+                if ($negative) {
+                    $signPosition = $negative + 2;
+                }
+                $doubleDotPosition = strpos($string, ':');
+                if ($negative || $positive) {
+                    $strEnd = substr($string, $signPosition ?? 0, strlen($string)-$doubleDotPosition-1);
+                    $result = (int) filter_var($strEnd, FILTER_SANITIZE_NUMBER_INT);
+                }
+                break;
+            }
+        }
+
+        return $result;
     }
 }
