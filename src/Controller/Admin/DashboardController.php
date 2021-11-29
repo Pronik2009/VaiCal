@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\City;
+use App\Entity\Device;
 use App\Entity\NewCity;
 use App\Entity\User;
 use App\Entity\Year;
@@ -45,9 +46,11 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Cities', 'fas fa-city', City::class);
         yield MenuItem::linkToCrud('Years', 'fas fa-clock', Year::class);
         yield MenuItem::section('Upload', 'fas fa-plug');
-        yield MenuItem::linkToRoute('Upload city file', 'fas fa-upload ', 'year_index');
+        yield MenuItem::linkToRoute('Upload city file', 'fas fa-upload', 'year_index');
         yield MenuItem::section('Incoming requests', 'fas fa-inbox');
-        yield MenuItem::linkToCrud('New city', 'fas fa-download ', NewCity::class);
+        yield MenuItem::linkToCrud('New city', 'fas fa-download', NewCity::class);
+        yield MenuItem::section('Devices', 'fas fa-plug');
+        yield MenuItem::linkToCrud('Devices', 'fas fa-phone', Device::class);
 
     }
 }

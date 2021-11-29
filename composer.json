@@ -30,7 +30,8 @@
         "symfony/property-access": "5.2.*",
         "symfony/property-info": "5.2.*",
         "symfony/proxy-manager-bridge": "5.2.*",
-        "symfony/security-bundle": "5.2.*",
+        "symfony/security-bundle": "5.*",
+        "symfony/security-guard": "5.*",
         "symfony/serializer": "5.2.*",
         "symfony/twig-bundle": "5.2.*",
         "symfony/validator": "5.2.*",
@@ -39,9 +40,6 @@
         "twig/twig": "^2.12|^3.0"
     }
     ,
-    "require-dev": {
-        "roave/security-advisories": "dev-latest"
-    },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": {
@@ -82,7 +80,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "5.2.*"
+            "require": "5.*"
         }
     },
     "name": "pronik2009/vaical",
