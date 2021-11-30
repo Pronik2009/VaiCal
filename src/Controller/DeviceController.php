@@ -3,11 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\NewCity;
-use DateInterval;
-use DateTime;
-use DateTimeZone;
 use Doctrine\ORM\NonUniqueResultException;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,60 +13,59 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class NewCityController extends AbstractController
+class DeviceController extends AbstractController
 {
     /**
-     * @Route("api/cities/new", methods={"POST"})
+     * @Route("api/devices/register", methods={"POST"})
      *
      * @param Request $request
-     * @param ManagerRegistry $managerRegistry
      *
      * @return JsonResponse
      *
      * @throws NonUniqueResultException
      */
-    public function postNewCity(Request $request, ManagerRegistry $managerRegistry): JsonResponse
+    public function postNewDevice(Request $request): JsonResponse
     {
         $data = $request->toArray();
 
         $validator = Validation::createValidator();
         $constraints = new Assert\Collection([
-            'name' => [
+            'model' => [
                 new Assert\NotBlank(),
                 new Assert\Length([
-                    'min' => 2,
-                    'max' => 40,
+                    'min' => 4,
+                    'max' => 60,
                     'minMessage' => "Name must be at least {{ limit }} characters long",
                     'maxMessage' => "Name cannot be longer than {{ limit }} characters",
                 ]),
             ],
-            'lat' => [
-                new Assert\NotBlank(),
-                new Assert\Length([
-                    'min' => 7,
-                    'max' => 18,
-                    'minMessage' => "Latitude must be at least {{ limit }} characters long",
-                    'maxMessage' => "Latitude cannot be longer than {{ limit }} characters",
-                ]),
-                new Assert\Regex('/^(\-?\d+(\.\d+)?)+$/', 'Coords can contain only numbers, "." and "-"'),
-            ],
-            'lon' => [
-                new Assert\NotBlank(),
-                new Assert\Length([
-                    'min' => 7,
-                    'max' => 18,
-                    'minMessage' => "Longitude must be at least {{ limit }} characters long",
-                    'maxMessage' => "Longitude cannot be longer than {{ limit }} characters",
-                ]),
-                new Assert\Regex('/^(\-?\d+(\.\d+)?)+$/', 'Coords can contain only numbers, "." and "-"'),
-            ],
+//            'lat' => [
+//                new Assert\NotBlank(),
+//                new Assert\Length([
+//                    'min' => 7,
+//                    'max' => 18,
+//                    'minMessage' => "Latitude must be at least {{ limit }} characters long",
+//                    'maxMessage' => "Latitude cannot be longer than {{ limit }} characters",
+//                ]),
+//                new Assert\Regex('/^(\-?\d+(\.\d+)?)+$/', 'Coords can contain only numbers, "." and "-"'),
+//            ],
+//            'lon' => [
+//                new Assert\NotBlank(),
+//                new Assert\Length([
+//                    'min' => 7,
+//                    'max' => 18,
+//                    'minMessage' => "Longitude must be at least {{ limit }} characters long",
+//                    'maxMessage' => "Longitude cannot be longer than {{ limit }} characters",
+//                ]),
+//                new Assert\Regex('/^(\-?\d+(\.\d+)?)+$/', 'Coords can contain only numbers, "." and "-"'),
+//            ],
             'token' => [
                 new Assert\NotBlank(),
                 new Assert\Length([
                     'min' => 32,
                     'max' => 32,
                 ]),
-                new Assert\Callback([__CLASS__,"validateSecurityHash"]),
+                new Assert\Callback([NewCityController::class,"validateSecurityHash"]),
             ],
         ]);
 
@@ -90,7 +85,7 @@ class NewCityController extends AbstractController
         $newCity->setUserAgent($request->headers->get('user-agent'));
 
         //Check if client try spam (sending often than 1 day)
-        $em = $managerRegistry->getManager();
+        $em = $this->getDoctrine()->getManager();
         if($em->getRepository(NewCity::class)->checkSpam($newCity)){
             return $this->json([
                 'errors' => 'you already sent City last 24hours, please wait',
@@ -107,25 +102,5 @@ class NewCityController extends AbstractController
         ],
             Response::HTTP_ACCEPTED
         );
-    }
-
-    public static function validateSecurityHash($object, ExecutionContextInterface $context, $payload): void
-    {
-        $date = new DateTime('now', new DateTimeZone('UTC'));
-        $key1 = $date->format('YmdH');
-        $key2 = $date->format('i');
-        if((int)$key2[1]<9){
-            $key2[1]='0';
-        } else {
-            $date->add(new DateInterval('PT1M'));
-            $key1 = $date->format('YmdH');
-            $key2 = $date->format('i');
-        }
-        $hash = md5($_ENV['SECRET_PHRASE'] . $key1 . $key2);
-
-        if ($object !== $hash) {
-            $context->buildViolation('Token is invalid, get out!')
-                ->addViolation();
-        }
     }
 }

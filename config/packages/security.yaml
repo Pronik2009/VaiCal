@@ -1,6 +1,7 @@
 security:
-#    encoders:
+    enable_authenticator_manager: true
     password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
         App\Entity\User:
             algorithm: auto
 
@@ -16,12 +17,11 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
             lazy: true
             provider: app_user_provider
-            guard:
-                authenticators:
-                    - App\Security\AppAuthenticator
+            form_login:
+                login_path: login
+                check_path: login
             logout:
                 path: app_logout
                 # where to redirect after logout

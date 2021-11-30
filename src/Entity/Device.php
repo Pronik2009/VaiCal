@@ -7,39 +7,59 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\DeviceRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DeviceRepository::class)
  * @ApiResource(
- *     collectionOperations={"post","get"={
+ *     collectionOperations={"register"={
  *          "method"="POST",
- *          "path"="/devices/",
- *          "controller"="NewCityController::class",
+ *          "path"="/devices/register",
+ *          "controller"="DeviceController::class",
  *          "openapi_context"={
- *              "summary"="Check device exist in database",
+ *              "summary"="Register new device in database",
  *              "description"="# Anonymous queries will be rejected.
  *      Accept queries only from front APP.
- *      Require two parameters in JSON, as city slug and security token
- *      On success return {id} of new city request, can be used while connect to employers",
+ *      Require all parameters in JSON, and security token",
  *              "requestBody"={"content"={"application/json"={"schema"={},"example"={
- *                  "name"="Perímetro Urbano Santiago de Cali",
- *                  "lat"="48.46012365355584",
- *                  "lon"="-35.04221496410461",
+ *                  "model"="ZTE Blade A7 2019",
+ *                  "platform"="Android",
+ *                  "uuid"="1234567890abcdef",
+ *                  "version"="1.2.3",
+ *                  "manufacturer"="ZTE",
+ *                  "serial"="unknown",
+ *                  "firebaseToken"="abcdefghijklmnopqrstuvwxzy0123456789",
+ *                  "city"="/api/cities/99999999",
+ *                  "token"="someHashHereABCDEFG1234567890blablabla",
+ *              }}}}
+ *          }
+ *     },
+ *     "check"={
+ *          "method"="POST",
+ *          "path"="/devices/check",
+ *          "controller"="DeviceController::class",
+ *          "openapi_context"={
+ *              "summary"="Check device is exist in database",
+ *              "description"="# Anonymous queries will be rejected.
+ *      Accept queries only from front APP.
+ *      Require device uuid and security token",
+ *              "requestBody"={"content"={"application/json"={"schema"={},"example"={
+ *                  "uuid"="1234567890abcdef",
  *                  "token"="someHashHereABCDEFG1234567890blablabla",
  *              }}}}
  *          }
  *     }},
- *     itemOperations={"get"},
+ *     itemOperations={},
  *     order={"name"="ASC"},
  *     normalizationContext={"groups"={"read"}},
  *     paginationEnabled=false
  * )
- *
- * @ApiFilter(SearchFilter::class, properties={"uuid": "exact"})
  */
 class Device
 {
+    use TimestampableEntity;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -49,39 +69,38 @@ class Device
 
     /**
      * @ORM\Column(type="string", length=255)
-     *
      * @Assert\NotBlank()
      */
     private string $model;
 
     /**
      * @ORM\Column(type="string", length=255)
-     *
      * @Assert\Choice({"Android", "iOS"})
      */
     private string $platform;
 
     /**
      * @ORM\Column(type="string", length=255)
-     *
-     * @Assert\NotBlank()
+     * @Assert\Unique()
+     * @Assert\Regex("/[0-9a-f]{16}/")
      * @Assert\Length(16)
      */
     private string $uuid;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Regex("/[\d\.]/")
      */
     private string $version;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
      */
     private string $manufacturer;
 
     /**
      * @ORM\Column(type="string", length=255)
-     *
      * @Assert\NotBlank()
      */
     private string $serial;
