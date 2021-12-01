@@ -18,39 +18,39 @@ class NewCity
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id = null;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $Name;
+    private string $Name;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $Latitude;
+    private string $Latitude;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $Longitude;
+    private string $Longitude;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $UserAgent;
+    private string $UserAgent;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $IP;
+    private string $IP;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->Name;
     }
@@ -62,7 +62,7 @@ class NewCity
         return $this;
     }
 
-    public function getLatitude(): ?string
+    public function getLatitude(): string
     {
         return $this->Latitude;
     }
@@ -74,7 +74,7 @@ class NewCity
         return $this;
     }
 
-    public function getLongitude(): ?string
+    public function getLongitude(): string
     {
         return $this->Longitude;
     }
@@ -86,7 +86,7 @@ class NewCity
         return $this;
     }
 
-    public function getUserAgent(): ?string
+    public function getUserAgent(): string
     {
         return $this->UserAgent;
     }
@@ -98,7 +98,7 @@ class NewCity
         return $this;
     }
 
-    public function getIP(): ?string
+    public function getIP(): string
     {
         return $this->IP;
     }

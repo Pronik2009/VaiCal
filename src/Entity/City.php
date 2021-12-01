@@ -80,7 +80,7 @@ class City
     private ?int $zone;
 
     /**
-     * @ORM\OneToOne(targetEntity=Device::class, mappedBy="city", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=Device::class, mappedBy="city", orphanRemoval=false)
      */
     private $device;
 

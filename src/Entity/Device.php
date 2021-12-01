@@ -2,16 +2,16 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\DeviceRepository;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=DeviceRepository::class)
+ * @UniqueEntity("uuid")
  * @ApiResource(
  *     collectionOperations={"register"={
  *          "method"="POST",
@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *                  "manufacturer"="ZTE",
  *                  "serial"="unknown",
  *                  "firebaseToken"="abcdefghijklmnopqrstuvwxzy0123456789",
- *                  "city"="/api/cities/99999999",
+ *                  "city"=99999999,
  *                  "token"="someHashHereABCDEFG1234567890blablabla",
  *              }}}}
  *          }
@@ -50,7 +50,24 @@ use Symfony\Component\Validator\Constraints as Assert;
  *              }}}}
  *          }
  *     }},
- *     itemOperations={},
+ *     itemOperations={"update"={
+ *          "method"="PATCH",
+ *          "path"="/devices/update/{id}",
+ *          "controller"="DeviceController::class",
+ *          "openapi_context"={
+ *              "summary"="Update device in database",
+ *              "description"="# Anonymous queries will be rejected.
+ *      Accept queries only from front APP.
+ *      Update at least firebaseToken or City parameters in JSON, and security token.
+ *      Require correct uuid and security token",
+ *              "requestBody"={"content"={"application/merge-patch+json"={"schema"={},"example"={
+ *                  "firebaseToken"="abcdefghijklmnopqrstuvwxzy0123456789",
+ *                  "city"=99999999,
+ *                  "uuid"="1234567890abcdef",
+ *                  "token"="someHashHereABCDEFG1234567890blablabla",
+ *              }}}}
+ *          }
+ *     }},
  *     order={"name"="ASC"},
  *     normalizationContext={"groups"={"read"}},
  *     paginationEnabled=false
@@ -80,7 +97,7 @@ class Device
     private string $platform;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\Unique()
      * @Assert\Regex("/[0-9a-f]{16}/")
      * @Assert\Length(16)
@@ -106,9 +123,26 @@ class Device
     private string $serial;
 
     /**
-     * @ORM\OneToOne(targetEntity=City::class, inversedBy="device", cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=City::class, inversedBy="devices")
+     * @ORM\JoinColumn(nullable=false)
      */
     private ?City $city;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $UserAgent;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $IP;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private string $firebaseToken;
+
 
     public function getId(): ?int
     {
@@ -197,5 +231,53 @@ class Device
         $this->city = $city;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserAgent(): string
+    {
+        return $this->UserAgent;
+    }
+
+    /**
+     * @param string $UserAgent
+     */
+    public function setUserAgent(string $UserAgent): void
+    {
+        $this->UserAgent = $UserAgent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIP(): string
+    {
+        return $this->IP;
+    }
+
+    /**
+     * @param string $IP
+     */
+    public function setIP(string $IP): void
+    {
+        $this->IP = $IP;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirebaseToken(): string
+    {
+        return $this->firebaseToken;
+    }
+
+    /**
+     * @param string $firebaseToken
+     */
+    public function setFirebaseToken(string $firebaseToken): void
+    {
+        $this->firebaseToken = $firebaseToken;
     }
 }
