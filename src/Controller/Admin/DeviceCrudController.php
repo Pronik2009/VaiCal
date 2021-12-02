@@ -31,6 +31,9 @@ class DeviceCrudController extends AbstractCrudController
             BooleanField::new('notification')->onlyOnForms(),
             IntegerField::new('notifyDay')->onlyOnForms(),
             TextField::new('notifyTime')->onlyOnForms(),
+            TextField::new('UserAgent'),
+            TextField::new('IP'),
+            TextField::new('firebaseToken')->onlyOnForms(),
         ];
     }
 }
