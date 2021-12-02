@@ -21,6 +21,7 @@ class ValidatorService
     private array $tokenAssert;
     private array $deviceUuid;
     private array $deviceRegister;
+    private array $deviceUpdateVerification;
     private array $deviceUpdate;
 
     public function __construct()
@@ -28,6 +29,7 @@ class ValidatorService
         // TODO: refactor this init when PHP 8.1 upgrade
         $this->tokenAssert = ['token' => [
             new Assert\NotBlank(),
+            new Assert\Type('string'),
             new Assert\Length([
                 'min' => 32,
                 'max' => 32,
@@ -37,6 +39,7 @@ class ValidatorService
         $this->newCityAssert = [
             'name' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Length([
                     'min' => 2,
                     'max' => 40,
@@ -46,6 +49,7 @@ class ValidatorService
             ],
             'lat' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Length([
                     'min' => 7,
                     'max' => 18,
@@ -56,6 +60,7 @@ class ValidatorService
             ],
             'lon' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Length([
                     'min' => 7,
                     'max' => 18,
@@ -68,6 +73,7 @@ class ValidatorService
         $this->deviceUuid = [
             'uuid' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Length([
                     'min' => 16,
                     'max' => 16,
@@ -80,6 +86,7 @@ class ValidatorService
         $this->deviceRegister = [
             'model' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Length([
                     'min' => 4,
                     'max' => 250,
@@ -96,10 +103,12 @@ class ValidatorService
             ],
             'version' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Regex('/[0-9\.]+$/', 'Version can contain only digits or "."'),
             ],
             'manufacturer' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
                 new Assert\Length([
                     'min' => 2,
                     'max' => 250,
@@ -109,6 +118,7 @@ class ValidatorService
             ],
             'serial' => [
                 new Assert\NotBlank(),
+                new Assert\Type('string'),
             ],
         ];
         $this->deviceUpdate = [
@@ -120,11 +130,34 @@ class ValidatorService
                     'minMessage' => "Uuid must be at least {{ limit }} characters long",
                     'maxMessage' => "Uuid cannot be longer than {{ limit }} characters",
                 ]),
+                new Assert\Type('string'),
                 new Assert\Regex('/[a-zA-Z0-9\_\:\-]+$/', 'Version can contain only alphanumeric or "_"'),
             ],
             'city' => [
                 new Assert\NotBlank(),
-                new Assert\Type('integer'),
+                new Assert\Type('int'),
+            ],
+        ];
+        $this->deviceUpdateVerification = [
+            'notification' => [
+                new Assert\NotBlank(),
+                new Assert\Type('Boolean'),
+            ],
+            'notifyDay' => [
+                new Assert\NotBlank(),
+                new Assert\Type('int'),
+                new Assert\Choice([0,1,2]),
+            ],
+            'notifyTime' => [
+                new Assert\NotBlank(),
+                new Assert\Type('string'),
+                new Assert\Length([
+                    'min' => 5,
+                    'max' => 5,
+                    'minMessage' => "String must be at least {{ limit }} characters long",
+                    'maxMessage' => "String cannot be longer than {{ limit }} characters",
+                ]),
+                new Assert\Regex('/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]+$/', 'Time can contain only hours, minutes or ":", as HH:MM'),
             ],
         ];
     }
@@ -168,7 +201,7 @@ class ValidatorService
                 $asserts = array_merge($this->deviceRegister, $this->deviceUuid, $this->deviceUpdate, $this->tokenAssert);
                 break;
             case self::UPDATE_DEVICE_ASSERT:
-                $asserts = array_merge($this->deviceUuid, $this->deviceUpdate, $this->tokenAssert);
+                $asserts = array_merge($this->deviceUuid, $this->deviceUpdate, $this->deviceUpdateVerification, $this->tokenAssert);
                 break;
             default:
                 throw new RuntimeException('Assert type not recognized');
