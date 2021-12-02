@@ -79,6 +79,11 @@ class City
      */
     private ?int $zone;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Device::class, mappedBy="city", orphanRemoval=false)
+     */
+    private $device;
+
     public function __construct()
     {
         $this->years = new ArrayCollection();
@@ -158,6 +163,28 @@ class City
     public function setZone(?int $zone): self
     {
         $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getDevice(): ?Device
+    {
+        return $this->device;
+    }
+
+    public function setDevice(?Device $device): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($device === null && $this->device !== null) {
+            $this->device->setCity(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($device !== null && $device->getCity() !== $this) {
+            $device->setCity($this);
+        }
+
+        $this->device = $device;
 
         return $this;
     }
