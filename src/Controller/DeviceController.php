@@ -60,6 +60,11 @@ class DeviceController extends AbstractController
         $newDevice->setIP($request->getClientIp());
         $newDevice->setUserAgent($request->headers->get('user-agent'));
 
+        // fill notification settings with default
+        $newDevice->setNotification(Device::NOTIFICATION_ENABLE);
+        $newDevice->setNotifyDay(Device::NOTIFICATION_BEFORE_DAY);
+        $newDevice->setNotifyTime(Device::NOTIFICATION_TIME);
+
         $this->em->persist($newDevice);
         $this->em->flush();
 

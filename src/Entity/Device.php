@@ -80,6 +80,10 @@ class Device
 {
     use TimestampableEntity;
 
+    public const NOTIFICATION_ENABLE = true;
+    public const NOTIFICATION_BEFORE_DAY = 1;
+    public const NOTIFICATION_TIME = '09:00';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -148,20 +152,20 @@ class Device
     /**
      * @ORM\Column(type="boolean")
      */
-    private bool $notification;
+    private bool $notification = self::NOTIFICATION_ENABLE;
 
     /**
      * @ORM\Column(type="smallint")
      * @Assert\Choice({0,1,2})
      */
-    private int $notifyDay;
+    private int $notifyDay = self::NOTIFICATION_BEFORE_DAY;
 
     /**
      * @ORM\Column(type="string", length=5)
      * @Assert\Length(5)
      * @Assert\Regex("/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/")
      */
-    private string $notifyTime;
+    private string $notifyTime = self::NOTIFICATION_TIME;
 
 
     public function getId(): ?int
