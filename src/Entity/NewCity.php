@@ -4,10 +4,12 @@ namespace App\Entity;
 
 use App\Repository\NewCityRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass=NewCityRepository::class)
+ * @UniqueEntity("name")
  */
 class NewCity
 {
@@ -21,7 +23,7 @@ class NewCity
     private ?int $id = null;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private string $Name;
 
