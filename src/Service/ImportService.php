@@ -315,7 +315,7 @@ class ImportService
     private function validateGcalFormat(array $file): void
     {
         $requiredStrings = [
-            'Narayana Masa, Gaurabda',
+            'Narayana Masa, Gaurabda ',
             'GCal 11',
             'DATE',
             'TITHI',
