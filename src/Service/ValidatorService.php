@@ -140,7 +140,6 @@ class ValidatorService
         ];
         $this->deviceUpdateVerification = [
             'notification' => [
-                new Assert\NotBlank(),
                 new Assert\Type('Boolean'),
             ],
             'notifyDay' => [

@@ -115,6 +115,9 @@ class DeviceController extends AbstractController
         $device->setCity($city);
         $device->setIP($request->getClientIp());
         $device->setUserAgent($request->headers->get('user-agent'));
+        $device->setNotification($data['notification']);
+        $device->setNotifyDay($data['notifyDay']);
+        $device->setNotifyTime($data['notifyTime']);
 
         $this->em->persist($device);
         $this->em->flush();
