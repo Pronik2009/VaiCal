@@ -56,13 +56,13 @@ class City
 
     /**
      * @Groups({"read"})
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      */
     private string $name;
 
     /**
      * @Groups({"read"})
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      */
     private string $slug;
 

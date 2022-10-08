@@ -174,6 +174,10 @@ class ValidatorService
             $key2 = $date->format('i');
         }
         $hash = md5($_ENV['SECRET_PHRASE'] . $key1 . $key2);
+
+//        print_r($hash . PHP_EOL);
+//        die();
+
         if ($object !== $hash) {
             $context->buildViolation('Token is invalid, get out!')
                 ->addViolation();

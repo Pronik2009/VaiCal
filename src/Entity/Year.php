@@ -344,7 +344,7 @@ class Year
         return $this->city;
     }
 
-    public function setCity(City $city): self
+    public function setCity(?City $city): self
     {
         $this->city = $city;
 

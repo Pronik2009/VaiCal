@@ -92,38 +92,38 @@ class Device
     private ?int $id = null;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      * @Assert\NotBlank()
      */
     private string $model;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      * @Assert\Choice({"Android", "iOS"})
      */
     private string $platform;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=170, unique=true)
      * @Assert\Regex("/[0-9a-f]{16}/")
      * @Assert\Length(16)
      */
     private string $uuid;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      * @Assert\Regex("/[\d\.]/")
      */
     private string $version;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      * @Assert\NotBlank()
      */
     private string $manufacturer;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      * @Assert\NotBlank()
      */
     private string $serial;
@@ -135,17 +135,17 @@ class Device
     private ?City $city;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      */
     private string $UserAgent;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      */
     private string $IP;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=170)
      */
     private string $firebaseToken;
 

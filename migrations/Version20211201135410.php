@@ -20,7 +20,7 @@ final class Version20211201135410 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE device ADD user_agent VARCHAR(255) NOT NULL, ADD ip VARCHAR(255) NOT NULL, ADD firebase_token VARCHAR(255) NOT NULL');
+        $this->addSql('ALTER TABLE device ADD user_agent VARCHAR(170) NOT NULL, ADD ip VARCHAR(170) NOT NULL, ADD firebase_token VARCHAR(170) NOT NULL');
     }
 
     public function down(Schema $schema): void
