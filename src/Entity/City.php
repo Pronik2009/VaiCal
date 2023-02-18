@@ -13,7 +13,6 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 /**
  * @ORM\Entity(repositoryClass=CityRepository::class)
  *
@@ -42,8 +41,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     paginationEnabled=false
  * )
  *
- * @ApiFilter(SearchFilter::class, properties={"slug": "exact", "name": "exact"})
- */
+ * @ApiFilter(SearchFilter::class, properties={"slug": "partial", "name": "partial"})
+  */
 class City
 {
     /**
