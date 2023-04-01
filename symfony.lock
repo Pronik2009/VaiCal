@@ -19,6 +19,12 @@
     "behat/transliterator": {
         "version": "v1.3.0"
     },
+    "beste/clock": {
+        "version": "2.1.0"
+    },
+    "beste/json": {
+        "version": "1.0.0"
+    },
     "composer/package-versions-deprecated": {
         "version": "1.11.99.1"
     },
@@ -111,14 +117,50 @@
             "ref": "b131e6cbfe1b898a508987851963fff485986285"
         }
     },
+    "fig/http-message-util": {
+        "version": "1.1.5"
+    },
     "fig/link-util": {
         "version": "1.1.2"
+    },
+    "firebase/php-jwt": {
+        "version": "v6.4.0"
     },
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.3"
     },
     "gedmo/doctrine-extensions": {
         "version": "v3.0.5"
+    },
+    "google/auth": {
+        "version": "v1.25.0"
+    },
+    "google/cloud-core": {
+        "version": "v1.49.3"
+    },
+    "google/cloud-storage": {
+        "version": "v1.30.2"
+    },
+    "google/crc32": {
+        "version": "v0.1.0"
+    },
+    "guzzlehttp/guzzle": {
+        "version": "7.5.0"
+    },
+    "guzzlehttp/promises": {
+        "version": "1.5.2"
+    },
+    "guzzlehttp/psr7": {
+        "version": "2.4.4"
+    },
+    "kreait/firebase-bundle": {
+        "version": "4.1.0"
+    },
+    "kreait/firebase-php": {
+        "version": "6.9.5"
+    },
+    "kreait/firebase-tokens": {
+        "version": "3.0.3"
     },
     "laminas/laminas-code": {
         "version": "4.2.0"
@@ -128,6 +170,18 @@
     },
     "laminas/laminas-zendframework-bridge": {
         "version": "1.2.0"
+    },
+    "lcobucci/clock": {
+        "version": "2.0.0"
+    },
+    "lcobucci/jwt": {
+        "version": "4.3.0"
+    },
+    "monolog/monolog": {
+        "version": "2.9.1"
+    },
+    "mtdowling/jmespath.php": {
+        "version": "2.6.1"
     },
     "nelmio/cors-bundle": {
         "version": "1.5",
@@ -156,17 +210,41 @@
     "psr/cache": {
         "version": "1.0.1"
     },
+    "psr/clock": {
+        "version": "1.0.0"
+    },
     "psr/container": {
         "version": "1.1.1"
     },
     "psr/event-dispatcher": {
         "version": "1.0.0"
     },
+    "psr/http-client": {
+        "version": "1.0.1"
+    },
+    "psr/http-factory": {
+        "version": "1.0.1"
+    },
+    "psr/http-message": {
+        "version": "1.0.1"
+    },
     "psr/link": {
         "version": "1.0.0"
     },
     "psr/log": {
         "version": "1.1.3"
+    },
+    "psr/simple-cache": {
+        "version": "1.0.1"
+    },
+    "ralouphie/getallheaders": {
+        "version": "3.0.3"
+    },
+    "riverline/multipart-parser": {
+        "version": "2.0.9"
+    },
+    "rize/uri-template": {
+        "version": "0.3.5"
     },
     "roave/security-advisories": {
         "version": "dev-latest"
@@ -182,6 +260,9 @@
         "files": [
             "./config/packages/sensio_framework_extra.yaml"
         ]
+    },
+    "stella-maris/clock": {
+        "version": "0.1.7"
     },
     "stof/doctrine-extensions-bundle": {
         "version": "1.2",

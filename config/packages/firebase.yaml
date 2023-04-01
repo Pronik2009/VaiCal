@@ -1,0 +1,4 @@
+kreait_firebase:
+  projects:
+    VaiCal:
+      credentials: '%kernel.project_dir%/config/VaiCal_credentials.json'
