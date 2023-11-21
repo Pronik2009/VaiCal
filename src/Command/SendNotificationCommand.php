@@ -4,6 +4,8 @@
 namespace App\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Exception\MessagingException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,21 +14,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class SendNotificationCommand extends Command
 {
     protected static $defaultName = 'send:notifications';
-
-    private EntityManagerInterface $database;
+    private NotificatorProcessor $notificator;
 
     public function __construct(EntityManagerInterface $em)
     {
-        $this->database = $em;
+        $this->notificator = new NotificatorProcessor($em);
 
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
-            ->setDescription('Send all on-time notifications to subscribers')
-        ;
+            ->setDescription('Send all on-time notifications to subscribers');
     }
 
     /**
@@ -34,24 +34,18 @@ class SendNotificationCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
+     *
+     * @throws FirebaseException
+     * @throws MessagingException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $count = $this->commandConsoleLogic();
+        $countSuccessNotifications = $this->notificator->initNotification();
 
-        $io->success('Sent ' . $count . ' notifications.');
+        $io->success('Sent ' . $countSuccessNotifications . ' notifications.');
 
         return Command::SUCCESS;
-    }
-
-    private function commandConsoleLogic(): int
-    {
-        $count = 0;
-
-        // some code, should return count of notifications, and set it to $count
-
-        return $count;
     }
 }
