@@ -2,31 +2,35 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\City;
 use App\Entity\Device;
+use App\Entity\Year;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController; 
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use Kreait\Firebase\Auth\SignIn\FailedToSignIn;
-use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
-use Kreait\Firebase\Exception\AuthException;
-use Kreait\Firebase\Exception\FirebaseException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Kreait\Firebase\Contract\Auth;
+use Kreait\Firebase\Factory;
 
 class DeviceCrudController extends AbstractCrudController
 {
-    private Auth $auth;
+    private function factory(): Factory {
+        return (new Factory)->withServiceAccount( dirname( __FILE__, 4 ) . '/config/VaiCal_credentials.json' );
+    }
+    
+    private EntityManager $database;
 
-    public function __construct(Auth $auth)
+    public function __construct( EntityManagerInterface $database )
     {
-        $this->auth = $auth;
+        $this->database = $database;
     }
 
     public static function getEntityFqcn(): string
@@ -66,53 +70,26 @@ class DeviceCrudController extends AbstractCrudController
         return parent::configureActions($actions);
     }
 
-    /**
-     * @throws FirebaseException
-     * @throws AuthException
-     */
-    public function renderAuth(AdminContext $context): RedirectResponse
+    public function renderAuth( AdminContext $context ): RedirectResponse
     {
-        $entity = $context->getEntity()->getInstance();
+        $devices = $this->database->getRepository( Device::class )->findAll();
+        $factory = $this->factory();
+        $messaging = $factory->createMessaging();
 
-        $uid = 'some-uid';
-        $customToken = $this->auth->createCustomToken($uid);
+        foreach ( $devices as $device ) { 
+            $fireBaseToken = $device->getFirebaseToken();
+            $result = $messaging->validateRegistrationTokens( $fireBaseToken );
 
-        // Get Custom token
-        $idTokenString = $customToken->toString();
+            if ( empty( $result[ 'valid' ] ) ) {
+                $id = $device->getId();
+                mail( 'damodara16108@gmail.com', 'Invalid Token', $id );
+            }
 
-        // Verify Custom token
-        $verifiedIdToken = null;
-        $verifyErrorMessage = '';
-        $signInErrorMessage = '';
-        $user = '';
-        $extractedUid = '';
-        $asTokenResponse = '';
-        try {
-            $verifiedIdToken = $this->auth->verifyIdToken($idTokenString);
-        } catch (FailedToVerifyToken $e) {
-            $verifyErrorMessage = $e->getMessage();
         }
-        if ($verifiedIdToken) {
-            $extractedUid = $verifiedIdToken->claims()->get('sub');
-            $user = $this->auth->getUser($uid);
-        }
-        // Sign in
-        try {
-            $signInResult = $this->auth->signInWithCustomToken($customToken);
-            $asTokenResponse = $signInResult->asTokenResponse();
-        } catch (FailedToSignIn $e) {
-            $signInErrorMessage = $e->getMessage();
-        }
+        
+        dump('End script');
 
-        dd(
-            $customToken->toString(),
-            $verifyErrorMessage,
-            $extractedUid,
-            $user,
-            $signInErrorMessage,
-            $asTokenResponse,
-        );
-
-        return new RedirectResponse('dumped', 302, []);
+        return new RedirectResponse( 'dumped', 302, [] );
     }
+    
 }
