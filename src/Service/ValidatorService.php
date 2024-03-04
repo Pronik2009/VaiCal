@@ -74,13 +74,13 @@ class ValidatorService
             'uuid' => [
                 new Assert\NotBlank(),
                 new Assert\Type('string'),
-                new Assert\Length([
-                    'min' => 16,
-                    'max' => 16,
-                    'minMessage' => "Uuid must be at least {{ limit }} characters long",
-                    'maxMessage' => "Uuid cannot be longer than {{ limit }} characters",
-                ]),
-                new Assert\Regex('/[0-9a-f]{16}+$/', 'Uuid can contain only hexadecimal symbols'),
+                // new Assert\Length([
+                //     'min' => 16,
+                //     'max' => 16,
+                //     'minMessage' => "Uuid must be at least {{ limit }} characters long",
+                //     'maxMessage' => "Uuid cannot be longer than {{ limit }} characters",
+                // ]),
+                //new Assert\Regex('/[0-9a-f]{16}+$/', 'Uuid can contain only hexadecimal symbols'),
             ]
         ];
         $this->deviceRegister = [
@@ -124,14 +124,14 @@ class ValidatorService
         $this->deviceUpdate = [
             'firebaseToken' => [
                 new Assert\NotBlank(),
-                new Assert\Length([
-                    'min' => 163,
-                    'max' => 163,
-                    'minMessage' => "Uuid must be at least {{ limit }} characters long",
-                    'maxMessage' => "Uuid cannot be longer than {{ limit }} characters",
-                ]),
+                //new Assert\Length([
+                //     'min' => 163,
+                //     'max' => 163,
+                //     'minMessage' => "Uuid must be at least {{ limit }} characters long",
+                //     'maxMessage' => "Uuid cannot be longer than {{ limit }} characters",
+                // ]),
                 new Assert\Type('string'),
-                new Assert\Regex('/[a-zA-Z0-9\_\:\-]+$/', 'Version can contain only alphanumeric or "_"'),
+                //new Assert\Regex('/[a-zA-Z0-9\_\:\-]+$/', 'Version can contain only alphanumeric or "_"'),
             ],
             'city' => [
                 new Assert\NotBlank(),
