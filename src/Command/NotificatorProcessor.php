@@ -232,7 +232,8 @@ class NotificatorProcessor
     {
         $count = 0;
         $devices = $this->database->getRepository(Device::class)->findAll();
-        $listAllMonth = ['January',
+        $listAllMonth = [
+            'January',
             'February',
             'March',
             'April',
