@@ -209,10 +209,17 @@ class NotificatorProcessor
 
         $result = $messaging->validateRegistrationTokens($deviceToken);
 
-        if (!empty($result['valid'])) {
-            $messaging->send($message);
-        } else {
-            return;
+        try {
+            $messaging->send( $message );
+        } catch ( NotFound $e ) {
+            $message_error = $e->getMessage();
+            $message_mail = $message_error . 
+                            'Id устройства - ' . $device->getId();
+            mail( 'damodara16108@gmail.com', 'Error Notification', $message_mail );
+
+            // Если я правильно понимаю, то здесь нужно удалять девайс, т. к. ошибка говорит,
+            // что Firebase неизвестен этот токен
+
         }
 
     }
