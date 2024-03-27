@@ -192,6 +192,7 @@ class NotificatorProcessor
                                       ->setParameter('city', $id)
                                       ->getQuery()
                                       ->getResult();
+        
         return current($return_year);
     }
 
