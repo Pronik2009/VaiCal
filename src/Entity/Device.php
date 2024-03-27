@@ -65,7 +65,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *                  "city"=99999999,
  *                  "notification"=true,
  *                  "notifyDay"=1,
- *                  "notifyTime"="09:00",
+ *                  "notifyTime"="07:00",
  *                  "uuid"="1234567890abcdef",
  *                  "token"="someHashHereABCDEFG1234567890blablabla",
  *              }}}}
@@ -82,7 +82,7 @@ class Device
 
     public const NOTIFICATION_ENABLE = true;
     public const NOTIFICATION_BEFORE_DAY = 1;
-    public const NOTIFICATION_TIME = '09:00';
+    public const NOTIFICATION_TIME = '07:00';
 
     /**
      * @ORM\Id

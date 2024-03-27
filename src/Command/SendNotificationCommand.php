@@ -42,9 +42,10 @@ class SendNotificationCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $countSuccessNotifications = $this->notificator->initNotification();
+        $result = $this->notificator->initNotification();
 
-        $io->success('Sent ' . $countSuccessNotifications . ' notifications.');
+        $io->success('Sent ' . $result['success'] . ' notifications.');
+        $io->warning('Deleted ' . $result['fail'] . ' devices.');
 
         return Command::SUCCESS;
     }

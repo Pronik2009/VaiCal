@@ -14,24 +14,28 @@ use Kreait\Firebase\Factory;
 
 class NotificatorProcessor
 {
-    private const AFTER_TOMORROW = 'Послезавтра';
+    private const APPEREANCE = 'Явление ';
+    private const DISAPPEREANCE = 'Уход ';
+    private const EKADASI = ' Экадаши';
+    private const AFTER_TOMORROW = 'Послезавтра'; 
     private const TOMORROW = 'Завтра';
     private const TODAY = 'Сегодня';
-    private const EVENT_1 = 'Нитьянанда Прабху';
-    private const EVENT_2 = 'Гаура-Пурнима, Шри Чайтанья Махапрабху';
-    private const EVENT_3 = 'Рама Навами, Рамачандра';
-    private const EVENT_4 = 'Наришимха';
-    private const EVENT_6 = 'Баларама';
-    private const EVENT_7 = 'Джанмастами, Кришна';
-    private const EVENT_8 = 'Бхактиведанта Свами Прабхупада';
-    private const EVENT_9 = 'Радхастами, Шримати Радхарани';
+    private const EVENT_1 = 'Нитьянанды Прабху';
+    private const EVENT_2 = 'Гаура-Пурнима, ' . self::APPEREANCE . 'Шри Чайтаньи Махапрабху';
+    private const EVENT_3 = 'Рама Навами, ' . self::APPEREANCE . 'Рамачандры';
+    private const EVENT_4 = 'Нришимхадева';
+    private const EVENT_6 = 'Баларамы';
+    private const EVENT_7 = 'Джанмастами, ' . self::APPEREANCE . ' Шри Кришны';
+    private const EVENT_8 = 'Бхактиведанты Свами Прабхупада';
+    private const EVENT_9 = 'Радхастами, ' . self::APPEREANCE . ' Шримати Радхарани';
     private const EVENT_A = 'Говардхана Пуджа';
     private const EVENT_B = 'Ратха-Ятра';
-    private const EVENT_SP = 'Сиддхасварупананда Парамахамса Прабхупада';
-    private const EVENT_CR = 'Рождество, Иисус Христос ';
+    private const EVENT_C = 'Бхактиведанты Свами Прабхупада';
+    private const EVENT_D = 'Бхактисиддханты Сарасвати Тхакура';
+    private const EVENT_E = 'Бхактивиноды Тхакура';
+    private const EVENT_SP = 'Вьясапуджа, ' . self::APPEREANCE . 'Сиддхасварупананды Парамахамсы Прабхупада';
+    private const EVENT_CR = 'Рождество, ' . self::APPEREANCE . ' Иисуса Христоса';
     private const CHRISTMAS_KEY = 'CR';
-    private const APPEREANCE = ' Явление';
-    private const EKADASI = ' Экадаши';
     private EntityManagerInterface $database;
 
     public function __construct(EntityManagerInterface $database)
@@ -83,17 +87,17 @@ class NotificatorProcessor
         $deviceEvent = [];
 
         if ($fullNameMonth === 'January') {
-            $deviceEvent = current($events)->getJan();
+            $deviceEvent = $events->getJan();
         } elseif ($fullNameMonth === 'February') {
-            $deviceEvent = current($events)->getFeb();
+            $deviceEvent = $events->getFeb();
         } elseif ($fullNameMonth === 'March') {
-            $deviceEvent = current($events)->getMar();
+            $deviceEvent = $events->getMar();
         } elseif ($fullNameMonth === 'April') {
-            $deviceEvent = current($events)->getApr();
+            $deviceEvent = $events->getApr();
         } elseif ($fullNameMonth === 'May') {
-            $deviceEvent = current($events)->getMay();
+            $deviceEvent = $events->getMay();
         } elseif ($fullNameMonth === 'June') {
-            $deviceEvent = current($events)->getJun();
+            $deviceEvent = $events->getJun();
             $searchKey = array_key_exists(14, $deviceEvent);
 
             if ($searchKey) {
@@ -103,17 +107,17 @@ class NotificatorProcessor
             }
 
         } elseif ($fullNameMonth === 'July') {
-            $deviceEvent = current($events)->getJul();
+            $deviceEvent = $events->getJul();
         } elseif ($fullNameMonth === 'August') {
-            $deviceEvent = current($events)->getAug();
+            $deviceEvent = $events->getAug();
         } elseif ($fullNameMonth === 'September') {
-            $deviceEvent = current($events)->getSem();
+            $deviceEvent = $events->getSem();
         } elseif ($fullNameMonth === 'October') {
-            $deviceEvent = current($events)->getOct();
+            $deviceEvent = $events->getOct();
         } elseif ($fullNameMonth === 'November') {
-            $deviceEvent = current($events)->getNov();
+            $deviceEvent = $events->getNov();
         } elseif ($fullNameMonth === 'December') {
-            $deviceEvent = current($events)->getDem();
+            $deviceEvent = $events->getDem();
 
             $searchKey = array_key_exists(25, $deviceEvent);
 
@@ -161,64 +165,59 @@ class NotificatorProcessor
             'Bhaimi' => 'Джая (Бхаими)' . self::EKADASI,
             'Sat-tila' => 'Шат-тила' . self::EKADASI,
             'Putrada' => 'Путрада' . self::EKADASI,
-            '1' => self::EVENT_1 . self::APPEREANCE,
-            '2' => self::EVENT_2 . self::APPEREANCE,
-            '3' => self::EVENT_3 . self::APPEREANCE,
-            '4' => self::EVENT_4 . self::APPEREANCE,
-            '6' => self::EVENT_6 . self::APPEREANCE,
-            '7' => self::EVENT_7 . self::APPEREANCE,
-            '8' => self::EVENT_8 . self::APPEREANCE,
-            '9' => self::EVENT_9 . self::APPEREANCE,
+            '1' => self::APPEREANCE . self::EVENT_1,
+            '2' => self::EVENT_2,
+            '3' => self::EVENT_3,
+            '4' => self::APPEREANCE . self::EVENT_4,
+            '6' => self::APPEREANCE . self::EVENT_6,
+            '7' => self::EVENT_7,
+            '8' => self::APPEREANCE . self::EVENT_8,
+            '9' => self::EVENT_9,
             'A' => self::EVENT_A . self::APPEREANCE,
             'B' => self::EVENT_B . self::APPEREANCE,
-            'SP' => self::EVENT_SP . self::APPEREANCE,
-            self::CHRISTMAS_KEY => self::EVENT_CR . self::APPEREANCE,
+            'C' => self::DISAPPEREANCE . self::EVENT_C,
+            'D' => self::APPEREANCE . self::EVENT_D,
+            'E' =>self::APPEREANCE . self::EVENT_E,
+            'SP' => self::EVENT_SP,
+            self::CHRISTMAS_KEY => self::EVENT_CR,
         };
     }
 
     private function getObjectEvents(int $year, ?int $id): Year
     {
-        return $this->database->getRepository(Year::class)
-            ->createQueryBuilder('y')
-            ->andWhere('y.value = ' . $year)
-            ->andWhere('y.city = :city')
-            ->setParameter('city', $id)
-            ->getQuery()
-            ->getResult();
+        $return_year = $this->database->getRepository(Year::class)
+                                      ->createQueryBuilder('y')
+                                      ->andWhere('y.value = ' . $year)
+                                      ->andWhere('y.city = :city')
+                                      ->setParameter('city', $id)
+                                      ->getQuery()
+                                      ->getResult();
+        
+        return current($return_year);
     }
 
     /**
      * @throws MessagingException
      * @throws FirebaseException
      */
-    private function sendNotification(string $deviceToken, string $title, string $body, Device $device): void
+    private function sendNotification(string $deviceToken, string $title, string|array $event, Device $device): bool
     {
         $factory = $this->factory();
         $messaging = $factory->createMessaging();
-
-//        $notification = Notification::fromArray([
-//            'title' => $title,
-//            'body' => $body,
-//            'sound' => true,
-//        ]);
-
-        $notification = Notification::create($title, $body);
-
+        $notification = Notification::create($title, $this->initEvent($event));
         $message = CloudMessage::withTarget('token', $deviceToken)
             ->withNotification($notification);
 
-        $result = $messaging->validateRegistrationTokens($deviceToken);
-
-        if (!empty($result['valid'])) {
+        try {
             $messaging->send($message);
+        } catch (NotFound $e) {
+            $this->database->remove($device);
+
+            return true;
         }
 
-// по идее нужно удалять этот девайс
-//            dump(
-//                $result['unknown'],
-//                $result['valid'],
-//                $device
-//            );
+        return false;
+
     }
 
     /**
@@ -227,11 +226,12 @@ class NotificatorProcessor
      */
     final public function initNotification(): int
     {
-        $count = 0;
-
+        $success = 0;
+        $fail = 0;
         $devices = $this->database->getRepository(Device::class)->findAll();
-
-        $listAllMonth = ['January',
+        $deviceStatus = false;
+        $listAllMonth = [
+            'January',
             'February',
             'March',
             'April',
@@ -260,9 +260,9 @@ class NotificatorProcessor
             $statusNotification = $device->getNotification();
             $timeZone = '';
 
-            if ($currentMinutes <= 6) {
+            if ($currentMinutes <= 9) {
                 $currentMinutes = 0;
-            } elseif ($currentMinutes > 30 && $currentMinutes <= 36) {
+            } elseif ($currentMinutes > 30 && $currentMinutes <= 39) {
                 $currentMinutes = 30;
             }
 
@@ -390,9 +390,7 @@ class NotificatorProcessor
                         if ($notifyDay === 0) {
 
                             if ($currentDayNumber === $number) {
-                                $titleNotIf = self::TODAY;
-                                $bodyNotIf = $this->initEvent($event);
-                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
                             } else {
                                 continue;
                             }
@@ -400,9 +398,7 @@ class NotificatorProcessor
                         } elseif ($notifyDay === 1) {
 
                             if ($currentDayNumber === $number) {
-                                $titleNotIf = self::TODAY;
-                                $bodyNotIf = $this->initEvent($event);
-                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
                             } else {
                                 $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
 
@@ -418,9 +414,7 @@ class NotificatorProcessor
                                         foreach ($deviceEventRepeat as $number => $event) {
 
                                             if ($currentDayNumber === $number) {
-                                                $titleNotIf = self::TOMORROW;
-                                                $bodyNotIf = $this->initEvent($event);
-                                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                             }
 
                                         }
@@ -434,9 +428,7 @@ class NotificatorProcessor
                                         foreach ($deviceEventRepeat as $number => $event) {
 
                                             if ($currentDayNumber === $number) {
-                                                $titleNotIf = self::TOMORROW;
-                                                $bodyNotIf = $this->initEvent($event);
-                                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                             }
 
                                         }
@@ -446,9 +438,7 @@ class NotificatorProcessor
                                 } else {
 
                                     if (($currentDayNumber + 1) === $number) {
-                                        $titleNotIf = self::TOMORROW;
-                                        $bodyNotIf = $this->initEvent($event);
-                                        $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                        $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                     }
 
                                 }
@@ -458,9 +448,7 @@ class NotificatorProcessor
                         } elseif ($notifyDay === 2) {
 
                             if ($currentDayNumber === $number) {
-                                $titleNotIf = self::TODAY;
-                                $bodyNotIf = $this->initEvent($event);
-                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
                             } else {
 
                                 $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
@@ -468,9 +456,7 @@ class NotificatorProcessor
                                 if (($currentDayNumber + 1) === $numberDayMonth) {
 
                                     if (($currentDayNumber + 1) === $number) {
-                                        $titleNotIf = self::TOMORROW;
-                                        $bodyNotIf = $this->initEvent($event);
-                                        $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                        $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                     } else {
 
                                         if ($currentNumberMonth === 11) { // если последний день года, то переходим в следующий год
@@ -483,9 +469,7 @@ class NotificatorProcessor
                                             foreach ($deviceEventRepeat as $number => $event) {
 
                                                 if ($currentDayNumberSub === $number) {
-                                                    $titleNotIf = self::AFTER_TOMORROW;
-                                                    $bodyNotIf = $this->initEvent($event);
-                                                    $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                    $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
                                                 }
 
                                             }
@@ -499,9 +483,7 @@ class NotificatorProcessor
                                             foreach ($deviceEventRepeat as $number => $event) {
 
                                                 if ($currentDayNumberSub === $number) {
-                                                    $titleNotIf = self::AFTER_TOMORROW;
-                                                    $bodyNotIf = $this->initEvent($event);
-                                                    $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                    $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
                                                 }
 
                                             }
@@ -520,13 +502,9 @@ class NotificatorProcessor
                                         foreach ($deviceEventRepeat as $number => $event) {
 
                                             if (1 === $number) {
-                                                $titleNotIf = self::TOMORROW;
-                                                $bodyNotIf = $this->initEvent($event);
-                                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                             } elseif (2 === $number) {
-                                                $titleNotIf = self::AFTER_TOMORROW;
-                                                $bodyNotIf = $this->initEvent($event);
-                                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
                                             }
 
                                         }
@@ -539,13 +517,9 @@ class NotificatorProcessor
                                         foreach ($deviceEventRepeat as $number => $event) {
 
                                             if (1 === $number) {
-                                                $titleNotIf = self::TOMORROW;
-                                                $bodyNotIf = $this->initEvent($event);
-                                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                             } elseif (2 === $number) {
-                                                $titleNotIf = self::AFTER_TOMORROW;
-                                                $bodyNotIf = $this->initEvent($event);
-                                                $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                                $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
                                             }
 
                                         }
@@ -553,13 +527,9 @@ class NotificatorProcessor
                                     }
 
                                 } elseif (($currentDayNumber + 1) === $number) {
-                                    $titleNotIf = self::TOMORROW;
-                                    $bodyNotIf = $this->initEvent($event);
-                                    $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                    $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                                 } elseif (($currentDayNumber + 2) === $number) {
-                                    $titleNotIf = self::AFTER_TOMORROW;
-                                    $bodyNotIf = $this->initEvent($event);
-                                    $this->sendNotification($firebaseToken, $titleNotIf, $bodyNotIf, $device);$count++;
+                                    $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
                                 }
 
                             }
@@ -571,7 +541,14 @@ class NotificatorProcessor
 
             }
         }
+
+        if ($fail !== 0) {
+            $this->database->flush();
+        }
         
-        return $count;
+        return [ 
+            'success' => $success, 
+            'fail' => $fail,
+        ];
     }
 }

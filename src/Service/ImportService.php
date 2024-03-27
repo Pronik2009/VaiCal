@@ -26,7 +26,9 @@ class ImportService
         'Appearance of Srimati Radharani',
         'Govardhana Puja',
         '  Ratha Yatra',
-//        'Srila Prabhupada -- Disappearance',
+        'Srila Prabhupada -- Disappearance',
+        'Srila Bhaktisiddhanta Sarasvati Thakura -- Appearance',
+        'Srila Bhaktivinoda Thakura -- Appearance',
     ];
     private EntityManagerInterface $em;
 
@@ -302,6 +304,10 @@ class ImportService
                 return 'B';
             case 13:
                 return 'C';
+            case 14:
+                return 'D';
+            case 15:
+                return 'E';
             default:
                 return 'ERROR!';
         }
