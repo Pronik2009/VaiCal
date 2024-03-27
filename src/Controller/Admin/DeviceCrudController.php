@@ -22,16 +22,6 @@ use Kreait\Firebase\Factory;
 
 class DeviceCrudController extends AbstractCrudController
 {
-    private function factory(): Factory {
-        return (new Factory)->withServiceAccount( dirname( __FILE__, 4 ) . '/config/VaiCal_credentials.json' );
-    }
-    
-    private EntityManager $database;
-
-    public function __construct( EntityManagerInterface $database )
-    {
-        $this->database = $database;
-    }
 
     public static function getEntityFqcn(): string
     {
@@ -56,40 +46,6 @@ class DeviceCrudController extends AbstractCrudController
             TextField::new('IP'),
             TextField::new('firebaseToken')->onlyOnForms(),
         ];
-    }
-
-    public function configureActions(Actions $actions): Actions
-    {
-        $viewInvoice = Action::new('get-FB-auth', 'get FB auth', 'fa fa-file-invoice')
-            ->linkToCrudAction('renderAuth')
-            ->createAsGlobalAction();
-
-        $actions
-            ->add(Crud::PAGE_INDEX, $viewInvoice);
-
-        return parent::configureActions($actions);
-    }
-
-    public function renderAuth( AdminContext $context ): RedirectResponse
-    {
-        $devices = $this->database->getRepository( Device::class )->findAll();
-        $factory = $this->factory();
-        $messaging = $factory->createMessaging();
-
-        foreach ( $devices as $device ) { 
-            $fireBaseToken = $device->getFirebaseToken();
-            $result = $messaging->validateRegistrationTokens( $fireBaseToken );
-
-            if ( empty( $result[ 'valid' ] ) ) {
-                $id = $device->getId();
-                mail( 'damodara16108@gmail.com', 'Invalid Token', $id );
-            }
-
-        }
-        
-        dump('End script');
-
-        return new RedirectResponse( 'dumped', 302, [] );
     }
     
 }
