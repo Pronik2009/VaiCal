@@ -224,7 +224,7 @@ class NotificatorProcessor
      * @throws MessagingException
      * @throws FirebaseException
      */
-    final public function initNotification(): int
+    final public function initNotification(): array
     {
         $success = 0;
         $fail = 0;
