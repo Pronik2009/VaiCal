@@ -7,7 +7,9 @@ use App\Entity\Device;
 use App\Entity\Year;
 use Doctrine\ORM\EntityManagerInterface;
 use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Exception\Messaging as MessagingErrors;
 use Kreait\Firebase\Exception\MessagingException;
+use Kreait\Firebase\Exception\NotFound;
 use Kreait\Firebase\Messaging\Notification;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Factory;
@@ -19,7 +21,7 @@ class NotificatorProcessor
     private const EKADASI = ' Экадаши';
     private const AFTER_TOMORROW = 'Послезавтра'; 
     private const TOMORROW = 'Завтра';
-    private const TODAY = 'Сегодня';
+    private const TODAY =    'Сегодня';
     private const EVENT_1 = 'Нитьянанды Прабху';
     private const EVENT_2 = 'Гаура-Пурнима, ' . self::APPEREANCE . 'Шри Чайтаньи Махапрабху';
     private const EVENT_3 = 'Рама Навами, ' . self::APPEREANCE . 'Рамачандры';
@@ -30,7 +32,6 @@ class NotificatorProcessor
     private const EVENT_9 = 'Радхастами, ' . self::APPEREANCE . ' Шримати Радхарани';
     private const EVENT_A = 'Говардхана Пуджа';
     private const EVENT_B = 'Ратха-Ятра';
-    private const EVENT_C = 'Бхактиведанты Свами Прабхупада';
     private const EVENT_D = 'Бхактисиддханты Сарасвати Тхакура';
     private const EVENT_E = 'Бхактивиноды Тхакура';
     private const EVENT_SP = 'Вьясапуджа, ' . self::APPEREANCE . 'Сиддхасварупананды Парамахамсы Прабхупада';
@@ -173,11 +174,11 @@ class NotificatorProcessor
             '7' => self::EVENT_7,
             '8' => self::APPEREANCE . self::EVENT_8,
             '9' => self::EVENT_9,
-            'A' => self::EVENT_A . self::APPEREANCE,
-            'B' => self::EVENT_B . self::APPEREANCE,
-            'C' => self::DISAPPEREANCE . self::EVENT_C,
+            'A' => self::EVENT_A,
+            'B' => self::EVENT_B,
+            'C' => self::DISAPPEREANCE . self::EVENT_8,
             'D' => self::APPEREANCE . self::EVENT_D,
-            'E' =>self::APPEREANCE . self::EVENT_E,
+            'E' => self::APPEREANCE . self::EVENT_E,
             'SP' => self::EVENT_SP,
             self::CHRISTMAS_KEY => self::EVENT_CR,
         };
@@ -195,28 +196,61 @@ class NotificatorProcessor
         
         return current($return_year);
     }
+    
+    private function deviceCookie(Device $device) {
+        
+    }
 
     /**
      * @throws MessagingException
      * @throws FirebaseException
      */
     private function sendNotification(string $deviceToken, string $title, string|array $event, Device $device): bool
-    {
+    {   
         $factory = $this->factory();
         $messaging = $factory->createMessaging();
         $notification = Notification::create($title, $this->initEvent($event));
         $message = CloudMessage::withTarget('token', $deviceToken)
             ->withNotification($notification);
-
+        $contentMail = '';
+        $themeMail = '';
+        $deviceDelete = false;
+        
         try {
             $messaging->send($message);
-        } catch (NotFound $e) {
+        } catch (MessagingErrors\NotFound $e) {
             $this->database->remove($device);
-
-            return true;
+            $contentMail = 'Id Device - ' . $device->getId();
+            $themeMail = 'Delete Device';
+            $deviceDelete = true;
+        } catch (MessagingErrors\InvalidMessage $e) {
+            $contentMail = 'Id Device - ' . $device->getId() . '; ' . $e->getMessage();
+            $themeMail = 'Invalid Message';
+            
+            if ($e->getMessage() === 'The registration token is not a valid FCM registration token') {
+                $this->database->remove($device);
+                $deviceDelete = true;
+            }
+            
+        } catch (MessagingErrors\ServerUnavailable $e) {
+            $retryAfter = $e->retryAfter();
+            $contentMail = 'Id Device - ' . $device->getId() . '; ' . $e->getMessage();
+            $themeMail = 'Server Unavailable';
+        } catch (MessagingErrors\ServerError $e) {
+            $contentMail = 'Id Device - ' . $device->getId() . '; ' . $e->getMessage();
+            $themeMail = 'Server Error';
+        } catch (MessagingException $e) {
+            $contentMail = 'Id Device - ' . $device->getId() . '; ' . $e->getMessage();
+            $themeMail = 'Error';
         }
-
-        return false;
+        
+        if ($contentMail !== '' && $themeMail !== '') mail($_ENV['EMAIL_ERROR_NOTIFICATION'], $themeMail, $contentMail); 
+    
+        if ($deviceDelete) {
+             return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -229,7 +263,6 @@ class NotificatorProcessor
         $success = 0;
         $fail = 0;
         $devices = $this->database->getRepository(Device::class)->findAll();
-        $deviceStatus = false;
         $listAllMonth = [
             'January',
             'February',
@@ -260,10 +293,8 @@ class NotificatorProcessor
             $statusNotification = $device->getNotification();
             $timeZone = '';
 
-            if ($currentMinutes <= 9) {
+            if ($currentMinutes <= 59) {
                 $currentMinutes = 0;
-            } elseif ($currentMinutes > 30 && $currentMinutes <= 39) {
-                $currentMinutes = 30;
             }
 
             if ($currentMinutes < 10) $currentMinutes = '0' . $currentMinutes;
@@ -280,6 +311,8 @@ class NotificatorProcessor
                 }
 
                 $timeDevice = $currentHours + $timeZone;
+                
+                // Здесь нужно подумать как добавлять час $timeDevice при переходе на летнее время
 
                 if ($timeDevice < 0) {
                     $timeDevice = $timeDevice + 24;
@@ -294,24 +327,19 @@ class NotificatorProcessor
 
                             if ($currentNumberMonth === 0) { // если январь, то заходим в прошлый год на 31 декабря
                                 $currentYear = $currentYear - 1;
-                                $currentNumberMonth = 11;
-                                $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
-                                $currentDayNumber = $numberDayMonth;
-                                $events = $this->getObjectEvents($currentYear, $cityId);
-                                $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                                $currentDayNumber = 31;
+                                $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[11]);
                             } else { // то заходим в прошлый месяц
                                 $currentNumberMonth = $currentNumberMonth - 1;
                                 $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
                                 $currentDayNumber = $numberDayMonth;
-                                $events = $this->getObjectEvents($currentYear, $cityId);
-                                $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                                $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[$currentNumberMonth]);
                             }
 
                         } else { // то заходим во вчерашний день
                             $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
                             $currentDayNumber = $currentDayNumber - 1;
-                            $events = $this->getObjectEvents($currentYear, $cityId);
-                            $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                            $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[$currentNumberMonth]);
                         }
 
                     } else {
@@ -337,23 +365,19 @@ class NotificatorProcessor
 
                             if ($currentNumberMonth === 11) { // если декабрь, то заходим в будущий год на 1 января
                                 $currentYear = $currentYear + 1;
-                                $currentNumberMonth = 0;
-                                $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
+                                $numberDayMonth = $this->getNumberDayMonth($listAllMonth, 0, $currentYear);
                                 $currentDayNumber = 1;
-                                $events = $this->getObjectEvents($currentYear, $cityId);
-                                $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                                $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[0]);
                             } else { // то заходим в следующий месяц на 1 число
                                 $currentNumberMonth = $currentNumberMonth + 1;
                                 $currentDayNumber = 1;
                                 $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
-                                $events = $this->getObjectEvents($currentYear, $cityId);
-                                $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                                $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[$currentNumberMonth]);
                             }
 
                         } else { // заходим в следующий день
                             $currentDayNumber = $currentDayNumber + 1;
-                            $events = $this->getObjectEvents($currentYear, $cityId);
-                            $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                            $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[$currentNumberMonth]);
                         }
 
                     } else {
@@ -361,6 +385,7 @@ class NotificatorProcessor
                     }
 
                 } else {
+                    
                     if ($timeDevice < 10) {
                         $timeDevice = '0' . $timeDevice;
                     }
@@ -368,16 +393,15 @@ class NotificatorProcessor
                     $timeDevice = $timeDevice . ':' . $currentMinutes;
 
                     if ($timeDevice === $notifyTime) {
-                        $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
-                        $events = $this->getObjectEvents($currentYear, $cityId);
-                        $deviceEvent = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
+                        $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
+                        $deviceEvent = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), $listAllMonth[$currentNumberMonth]);
                     } else {
                         continue;
                     }
 
                 }
 
-                if ($events !== null) {
+                if (isset($deviceEvent)) {
 
                     foreach ($deviceEvent as $number => $event) {
 
@@ -387,159 +411,116 @@ class NotificatorProcessor
                             $number = 25;
                         }
 
-                        if ($notifyDay === 0) {
+                        if ($currentDayNumber === $number) {
+                            $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
+                        }
 
-                            if ($currentDayNumber === $number) {
-                                $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
-                            } else {
-                                continue;
+                        if ($notifyDay === 1 || $notifyDay === 2) {
+
+                            if (($currentDayNumber + 1) === $number) {
+                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
                             }
+                            
+                            if ($notifyDay === 2) {
 
-                        } elseif ($notifyDay === 1) {
-
-                            if ($currentDayNumber === $number) {
-                                $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
-                            } else {
-                                $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
-
-                                if ($currentDayNumber === $numberDayMonth) { // если последний день месяца или года
-
-                                    if ($currentNumberMonth === 11) { // если последний день года, то переходим в следующий год
-                                        $currentYear = $currentYear + 1;
-                                        $currentDayNumber = 1;
-                                        $currentNumberMonth = 0;
-                                        $events = $this->getObjectEvents($currentYear, $cityId);
-                                        $deviceEventRepeat = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
-
-                                        foreach ($deviceEventRepeat as $number => $event) {
-
-                                            if ($currentDayNumber === $number) {
-                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                            }
-
-                                        }
-
-                                    } else { // если нет, то переходим в следующий месяц
-                                        $currentNumberMonth = $currentNumberMonth + 1;
-                                        $currentDayNumber = 1;
-                                        $events = $this->getObjectEvents($currentYear, $cityId);
-                                        $deviceEventRepeat = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
-
-                                        foreach ($deviceEventRepeat as $number => $event) {
-
-                                            if ($currentDayNumber === $number) {
-                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                            }
-
-                                        }
-
-                                    }
-
-                                } else {
-
-                                    if (($currentDayNumber + 1) === $number) {
-                                        $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                    }
-
-                                }
-
-                            }
-
-                        } elseif ($notifyDay === 2) {
-
-                            if ($currentDayNumber === $number) {
-                                $this->sendNotification($firebaseToken, self::TODAY, $event, $device) ? $fail++ : $success++;
-                            } else {
-
-                                $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
-
-                                if (($currentDayNumber + 1) === $numberDayMonth) {
-
-                                    if (($currentDayNumber + 1) === $number) {
-                                        $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                    } else {
-
-                                        if ($currentNumberMonth === 11) { // если последний день года, то переходим в следующий год
-                                            $currentYear = $currentYear + 1;
-                                            $currentDayNumberSub = 1;
-                                            $currentNumberMonth = 0;
-                                            $events = $this->getObjectEvents($currentYear, $cityId);
-                                            $deviceEventRepeat = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
-
-                                            foreach ($deviceEventRepeat as $number => $event) {
-
-                                                if ($currentDayNumberSub === $number) {
-                                                    $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
-                                                }
-
-                                            }
-
-                                        } else { // если нет, то переходим в следующий месяц
-                                            $currentNumberMonth = $currentNumberMonth + 1;
-                                            $currentDayNumberSub = 1;
-                                            $events = $this->getObjectEvents($currentYear, $cityId);
-                                            $deviceEventRepeat = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
-
-                                            foreach ($deviceEventRepeat as $number => $event) {
-
-                                                if ($currentDayNumberSub === $number) {
-                                                    $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
-                                                }
-
-                                            }
-
-                                        }
-
-                                    }
-
-                                } elseif ($currentDayNumber === $numberDayMonth) {
-
-                                    if ($currentNumberMonth === 11) { // если последний день года, то переходим в следующий год
-                                        $currentYear = $currentYear + 1;
-                                        $events = $this->getObjectEvents($currentYear, $cityId);
-                                        $deviceEventRepeat = $this->getDeviceEvent($events, $listAllMonth[0]);
-
-                                        foreach ($deviceEventRepeat as $number => $event) {
-
-                                            if (1 === $number) {
-                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                            } elseif (2 === $number) {
-                                                $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
-                                            }
-
-                                        }
-
-                                    } else { // если нет, то переходим в следующий месяц
-                                        $currentNumberMonth = $currentNumberMonth + 1;
-                                        $events = $this->getObjectEvents($currentYear, $cityId);
-                                        $deviceEventRepeat = $this->getDeviceEvent($events, $listAllMonth[$currentNumberMonth]);
-
-                                        foreach ($deviceEventRepeat as $number => $event) {
-
-                                            if (1 === $number) {
-                                                $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                            } elseif (2 === $number) {
-                                                $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
-                                            }
-
-                                        }
-
-                                    }
-
-                                } elseif (($currentDayNumber + 1) === $number) {
-                                    $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
-                                } elseif (($currentDayNumber + 2) === $number) {
+                                if (($currentDayNumber + 2) === $number) {
                                     $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
                                 }
-
+    
                             }
 
                         }
+                        
                     }
+                
+                    // Заглянем в следующий месяц или следующий год, если последний или предпоследний день месяца
+                    if ($notifyDay === 1 || $notifyDay === 2) {
+                        $numberDayMonth = $this->getNumberDayMonth($listAllMonth, $currentNumberMonth, $currentYear);
+                        
+                        if (($currentDayNumber + 1) === $numberDayMonth && $notifyDay === 2) { // если предпоследний день месяца или года
+            
+                            if ($currentNumberMonth === 11) { // если декабрь, то переходим в следующий год
+                                $currentYearSub = $currentYear + 1;
+                                $deviceEventRepeat = $this->getDeviceEvent($this->getObjectEvents($currentYearSub, $cityId), 
+                                                                           $listAllMonth[0]);
 
+                                foreach ($deviceEventRepeat as $number => $event) {
+
+                                    if (1 === $number) {
+                                        $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
+                                    }
+
+                                }
+
+                            } else { // если нет, то переходим в следующий месяц
+                                $currentNumberMonthSub = $currentNumberMonth + 1;
+                                $deviceEventRepeat = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), 
+                                                                           $listAllMonth[$currentNumberMonthSub]);
+
+                                foreach ($deviceEventRepeat as $number => $event) {
+
+                                    if (1 === $number) {
+                                        $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
+                                    }
+
+                                }
+
+                            }
+                                    
+                        } elseif ($currentDayNumber === $numberDayMonth) { // если последний день месяца или года
+                
+                            if ($currentNumberMonth === 11) { // если последний день года, то переходим в следующий год
+                                $currentYearSub = $currentYear + 1;
+                                $deviceEventRepeat = $this->getDeviceEvent($this->getObjectEvents($currentYearSub, $cityId), 
+                                                                           $listAllMonth[0]);
+    
+                                foreach ($deviceEventRepeat as $number => $event) {
+    
+                                    if (1 === $number) {
+                                        $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
+                                    }
+                                    
+                                    if ($notifyDay === 2) {
+                                    
+                                        if (2 === $number) {
+                                            $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
+                                        }
+                                        
+                                    }
+    
+                                }
+    
+                            } else { // если нет, то переходим в следующий месяц
+                                $currentNumberMonthSub = $currentNumberMonth + 1;
+                                $deviceEventRepeat = $this->getDeviceEvent($this->getObjectEvents($currentYear, $cityId), 
+                                                                           $listAllMonth[$currentNumberMonthSub]);
+    
+                                foreach ($deviceEventRepeat as $number => $event) {
+    
+                                    if (1 === $number) {
+                                        $this->sendNotification($firebaseToken, self::TOMORROW, $event, $device) ? $fail++ : $success++;
+                                    }
+                                    
+                                    if ($notifyDay === 2) {
+                                    
+                                        if (2 === $number) {
+                                            $this->sendNotification($firebaseToken, self::AFTER_TOMORROW, $event, $device) ? $fail++ : $success++;
+                                        }
+                                        
+                                    }
+    
+                                }
+    
+                            }
+                                         
+                        }
+                        
+                    }
+        
                 }
-
+                
             }
+
         }
 
         if ($fail !== 0) {
