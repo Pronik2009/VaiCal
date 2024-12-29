@@ -37,6 +37,10 @@ class Year
 
     #[Groups(["year"])]
     #[ORM\Column(type: "array", nullable: true)]
+    private ?array $jan = [];
+
+    #[Groups(["year"])]
+    #[ORM\Column(type: "array", nullable: true)]
     private ?array $feb = [];
 
     #[Groups(["year"])]
