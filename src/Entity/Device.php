@@ -4,14 +4,15 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\DeviceRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: DeviceRepository::class)]
+#[UniqueEntity('uuid')]
 /**
- * @ORM\Entity(repositoryClass=DeviceRepository::class)
- * @UniqueEntity("uuid")
  * @ApiResource(
  *     collectionOperations={"register"={
  *          "method"="POST",
@@ -84,88 +85,63 @@ class Device
     public const NOTIFICATION_BEFORE_DAY = 1;
     public const NOTIFICATION_TIME = '07:00';
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     * @Assert\NotBlank()
-     */
+    #[ORM\Column(type: 'string', length: 170)]
+    #[Assert\NotBlank]
     private string $model;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     * @Assert\Choice({"Android", "iOS"})
-     */
+    #[ORM\Column(type: 'string', length: 170)]
+    #[Assert\Choice(['Android', 'iOS'])]
     private string $platform;
 
-    /**
-     * @ORM\Column(type="string", length=170, unique=true)
-     * @Assert\Regex("/[0-9a-f]{16}/")
-     * @Assert\Length(16)
-     */
+    #[ORM\Column(type: 'string', length: 170, unique: true)]
+    #[Assert\Regex('/[0-9a-f]{16}/')]
+    #[Assert\Length(16)]
     private string $uuid;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     * @Assert\Regex("/[\d\.]/")
-     */
+    #[ORM\Column(type: 'string', length: 170)]
+    #[Assert\Regex('/[\d\.]/')]
     private string $version;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     * @Assert\NotBlank()
-     */
+    #[ORM\Column(type: 'string', length: 170)]
+    #[Assert\NotBlank]
     private string $manufacturer;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     * @Assert\NotBlank()
-     */
+    #[ORM\Column(type: 'string', length: 170)]
+    #[Assert\NotBlank]
     private string $serial;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=City::class, inversedBy="devices")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: City::class, inversedBy: 'devices')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?City $city;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $UserAgent;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $IP;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $firebaseToken;
 
-    /**
-     * @ORM\Column(type="boolean")
-     */
+    #[ORM\Column(type: 'boolean')]
     private bool $notification = self::NOTIFICATION_ENABLE;
 
-    /**
-     * @ORM\Column(type="smallint")
-     * @Assert\Choice({0,1,2})
-     */
+    #[ORM\Column(type: 'smallint')]
+    #[Assert\Choice([0, 1, 2])]
     private int $notifyDay = self::NOTIFICATION_BEFORE_DAY;
 
-    /**
-     * @ORM\Column(type="string", length=5)
-     * @Assert\Length(5)
-     * @Assert\Regex("/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/")
-     */
+    #[ORM\Column(type: 'string', length: 5)]
+    #[Assert\Length(5)]
+    #[Assert\Regex('/(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]/')]
     private string $notifyTime = self::NOTIFICATION_TIME;
+
+    #[ORM\ManyToOne(targetEntity: Language::class, inversedBy: 'devices')]
+    private ?Language $Language = null;
 
 
     public function getId(): ?int
@@ -337,6 +313,23 @@ class Device
     public function setNotifyTime(string $notifyTime): self
     {
         $this->notifyTime = $notifyTime;
+
+        return $this;
+    }
+
+    public function isNotification(): ?bool
+    {
+        return $this->notification;
+    }
+
+    public function getLanguage(): ?Language
+    {
+        return $this->Language;
+    }
+
+    public function setLanguage(?Language $Language): static
+    {
+        $this->Language = $Language;
 
         return $this;
     }

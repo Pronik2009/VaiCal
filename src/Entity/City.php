@@ -7,15 +7,15 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\CityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ORM\Entity(repositoryClass: CityRepository::class)]
 /**
- * @ORM\Entity(repositoryClass=CityRepository::class)
- *
  * @ApiResource(
  *     collectionOperations={"get","post"={
  *          "method"="POST",
@@ -42,50 +42,39 @@ use Symfony\Component\Validator\Constraints as Assert;
  * )
  *
  * @ApiFilter(SearchFilter::class, properties={"slug": "partial", "name": "partial"})
-  */
+ */
 class City
 {
-    /**
-     * @Groups({"read"})
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[Groups(["read"])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    /**
-     * @Groups({"read"})
-     * @ORM\Column(type="string", length=170)
-     */
+    #[Groups(["read"])]
+    #[ORM\Column(type: "string", length: 170)]
     private string $name;
 
-    /**
-     * @Groups({"read"})
-     * @ORM\Column(type="string", length=170)
-     */
+    #[Groups(["read"])]
+    #[ORM\Column(type: "string", length: 170)]
     private string $slug;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Year::class, mappedBy="city", orphanRemoval=true)
-     */
-    private $years;
+    #[ORM\OneToMany(targetEntity: Year::class, mappedBy: "city", orphanRemoval: true)]
+    private Collection $years;
 
-    /**
-     * @Groups({"read"})
-     * @ORM\Column(type="smallint", nullable=true)
-     * @Assert\GreaterThanOrEqual(-12)
-     * @Assert\LessThanOrEqual(12)
-     */
+    #[Groups(["read"])]
+    #[ORM\Column(type: "smallint", nullable: true)]
+    #[Assert\GreaterThanOrEqual(-12)]
+    #[Assert\LessThanOrEqual(12)]
     private ?int $zone;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Device::class, mappedBy="city", orphanRemoval=false)
-     */
-    private $device;
+    #[ORM\OneToMany(targetEntity: Device::class, mappedBy: "city", orphanRemoval: false)]
+    private Collection $device;
 
     public function __construct()
     {
         $this->years = new ArrayCollection();
+        $this->device = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -127,7 +116,7 @@ class City
     /**
      * @return Collection|Year[]
      */
-    public function getYears(): Collection
+    public function getYears(): array|Collection
     {
         return $this->years;
     }
@@ -184,6 +173,28 @@ class City
         }
 
         $this->device = $device;
+
+        return $this;
+    }
+
+    public function addDevice(Device $device): static
+    {
+        if (!$this->device->contains($device)) {
+            $this->device->add($device);
+            $device->setCity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDevice(Device $device): static
+    {
+        if ($this->device->removeElement($device)) {
+            // set the owning side to null (unless already changed)
+            if ($device->getCity() === $this) {
+                $device->setCity(null);
+            }
+        }
 
         return $this;
     }
