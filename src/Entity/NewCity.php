@@ -7,44 +7,30 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
-/**
- * @ORM\Entity(repositoryClass=NewCityRepository::class)
- * @UniqueEntity("name")
- */
+#[ORM\Entity(repositoryClass: NewCityRepository::class)]
+#[UniqueEntity('name')]
 class NewCity
 {
     use TimestampableEntity;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    /**
-     * @ORM\Column(type="string", length=170, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 170, unique: true)]
     private string $Name;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $Latitude;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $Longitude;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $UserAgent;
 
-    /**
-     * @ORM\Column(type="string", length=170)
-     */
+    #[ORM\Column(type: 'string', length: 170)]
     private string $IP;
 
     public function getId(): ?int
