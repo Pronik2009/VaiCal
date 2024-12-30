@@ -99,8 +99,7 @@ class Device
     private string $platform;
 
     #[ORM\Column(type: 'string', length: 170, unique: true)]
-    #[Assert\Regex('/[0-9a-f]{16}/')]
-    #[Assert\Length(16)]
+    #[Assert\Regex('/^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$|[0-9a-f]{16}/')]
     private string $uuid;
 
     #[ORM\Column(type: 'string', length: 170)]
@@ -141,7 +140,7 @@ class Device
     private string $notifyTime = self::NOTIFICATION_TIME;
 
     #[ORM\ManyToOne(targetEntity: Language::class, inversedBy: 'devices')]
-    private ?Language $Language = null;
+    private ?Language $language = null;
 
 
     public function getId(): ?int
@@ -324,12 +323,12 @@ class Device
 
     public function getLanguage(): ?Language
     {
-        return $this->Language;
+        return $this->language;
     }
 
-    public function setLanguage(?Language $Language): static
+    public function setLanguage(?Language $language): static
     {
-        $this->Language = $Language;
+        $this->language = $language;
 
         return $this;
     }

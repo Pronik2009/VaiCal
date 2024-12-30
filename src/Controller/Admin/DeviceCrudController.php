@@ -6,6 +6,7 @@ use App\Entity\Device;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController; 
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -26,14 +27,14 @@ class DeviceCrudController extends AbstractCrudController
             TextField::new('uuid'),
             TextField::new('version'),
             TextField::new('manufacturer'),
-            TextField::new('serial'),
             AssociationField::new('city'),
             BooleanField::new('notification'),
             IntegerField::new('notifyDay'),
             TextField::new('notifyTime'),
-            TextField::new('UserAgent'),
+            AssociationField::new('language'),
             TextField::new('IP'),
             TextField::new('firebaseToken')->onlyOnForms(),
+            DateField::new('createdAt')->hideOnForm(),
         ];
     }
     

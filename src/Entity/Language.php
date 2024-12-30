@@ -24,6 +24,11 @@ class Language
     #[ORM\OneToMany(mappedBy: 'Language', targetEntity: Device::class)]
     private Collection $devices;
 
+    public function __toString(): string
+    {
+        return $this->getFullName() ?? 'undefined';
+    }
+
     public function __construct()
     {
         $this->devices = new ArrayCollection();
