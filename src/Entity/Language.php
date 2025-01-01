@@ -2,12 +2,33 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Controller\LanguageController;
 use App\Repository\LanguageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LanguageRepository::class)]
+#[ApiResource(
+    collectionOperations: [
+        'get' => [
+            'method' => 'GET',
+            'path' => '/languages/check',
+            'controller' => LanguageController::class,
+            'openapi_context' => [
+                'summary' => 'Check if language exist in database',
+                'description' => '# one property should be passed in format:
+                 en-GB, ru-RU, es-ES, uk-UA, etc.',
+            ],
+        ],
+    ],
+    itemOperations: [],
+    paginationEnabled: false
+)]
+#[ApiFilter(SearchFilter::class, properties: ['shortName' => 'exact'])]
 class Language
 {
     #[ORM\Id]
